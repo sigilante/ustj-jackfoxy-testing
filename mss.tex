@@ -4,9 +4,9 @@
 
 \addbibresource{mss.bib}
 
-\newcommand{\authorname}{Ernest P. Worrell}
-\newcommand{\authorpatp}{\patp{sampel-palnet}}
-\newcommand{\affiliation}{Kamp Kikakee}
+\newcommand{\authorname}{Jack Fox}
+\newcommand{\authorpatp}{\patp{nomryg-nilref}}
+\newcommand{\affiliation}{FoxyLabs}
 
 %  Make first page footer:
 \fancypagestyle{firststyle}{%
@@ -23,11 +23,11 @@
 %  Arrange subsequent pages:
 \fancyhf{}
 \fancyhead[LE]{{\urbitfont Urbit Systems Technical Journal}}
-\fancyhead[RO]{Floating-Point Arithmetic on Deterministic Systems}
+\fancyhead[RO]{What Should I Test?}
 \fancyfoot[LE,RO]{\thepage}
 
 %%MANUSCRIPT
-\title{Ernest Goes to Mars:  An Enquiry into the Foundations of Artificial Stupidity}
+\title{What Should I Test?}
 \author{\authorname~\authorpatp \\ \affiliation}
 \date{}
 
@@ -37,7 +37,7 @@
 \thispagestyle{firststyle}
 
 \begin{abstract}
-In this groundbreaking paper, we embark on a cosmic journey with the renowned character Ernest P. Worrell as he ventures into the unexplored realm of Martian computing. Drawing inspiration from Ernest's comically ingenious encounters with everyday challenges, we investigate the foundations of what we term "Artificial Stupidity." As Ernest grapples with Martian technology, we delve into the intricacies of programming errors, algorithmic missteps, and the curious phenomena that arise when human-like intelligence meets extraterrestrial computing systems. Our analysis sheds light on the unexpected intersections between humor, artificial intelligence, and the cosmic absurdity of Martian software. Join us in this interplanetary exploration as we unravel the mysteries of Artificial Stupidity through the lens of Ernest's interstellar escapades.
+Testing, including unit testing, forms a critical step in software development.  This article explores the philosophy and practice of testing in the context of Hoon and Urbit development, particularly as motivated by the development of urQL and Obelisk.  Principles and best practices are suggested, as well as a practical example of testing in Hoon.
 \end{abstract}
 
 % We will adjust page numbering in final editing.
@@ -46,72 +46,306 @@ In this groundbreaking paper, we embark on a cosmic journey with the renowned ch
 
 \tableofcontents
 
-\section{Introduction}
+What should I test?
 
-Introduce the scope of your article and investigation.
+Everything.  If you don't test it, it doesn't work.
 
-\section{Background and Literature}
+\section{What does “test everything” even mean?}
 
-Exposite the relevant background and literature.
+\emph{Everything} raises more questions than it answers. However, they fall into two categories, what and how.
 
-\begin{enumerate}
-  \item  Prefer to \texttt{enumerate}.
-  \item  It is easier to refer to than \texttt{itemize}.
-\end{enumerate}
+No one writes non-trivial software without testing, even if you come to believe that if it builds, it works. The first time you ran your software was a test. Chances are, you ran individual components to see if those worked. Why not take the extra few minutes to record those tests and results? With practice you will get smart about efficiently recording your throw-away tests. And after you read this I hope you will have a new appreciation of why it is worth the extra time to record your tests.
 
-\noindent
-Mark \texttt{\textbackslash noindent} in paragraphs that continue the thought of an \texttt{\textbackslash enumerate} block.
+\section{What test framework should I use?}
 
-\section{Urbit's Implementation}
+Use what is useful and don't get hung-up on a particular framework or methodology. Record tests as you develop. You may think this slows down your development. That's not necessarily a bad thing. You will move forward with confidence that the last thing you worked on really works and you will find yourself thinking through your specification at a deeper level. This is important in a world of mostly incomplete and nebulous specs. What I am driving at is a sort of cousin to Test Driven Development. Think of it as real-time test development.
 
-Oftentimes you will then turn to exploring how Urbit or closely related systems like Nockchain have approached or considered a problem.  You can look at a PR like \citetpr{urbit_urbit_6891}.
+Your test suite has two important non-obvious functions, as regression tests (OK, this one should be obvious) and as part of your specification. If an existing test starts failing, carefully consider Chesterton's fence \citep{WikipediaChesterton} before taking the easy road and removing the test.
 
-\lstset{language=C}
+Regression tests are important not just to prevent unexpectedly breaking functionality, but to allow you to refactor with confidence. Great software is the result of constant refactoring.
+
+\section{What is a unit, anyway?}
+
+Descending from the hypothetical to the practical, every practical programming language comes with a unit testing environment. In Hoon, this is \texttt{/lib/test/hoon} on the \texttt{\%base} desk. Copy it to \texttt{/lib} in your development desk. Here is an article on working with it. The rest of this article assumes a working knowledge of \texttt{/lib/test/hoon}.
+
+Don't get hung up on unit testing dogma. A unit is whatever you want it to be. As a subject-oriented programming language, Hoon does not support private properties and functions: every arm and core in your software is accessible for testing. Generally a unit is some self-contained level of functionality, either from the programmer's or the user's point of view.
+
+Here's an extreme unit test, some may even say it is not a unit test, but an integration test (or something else).
+
+First, we need to build out a little more infrastructure, because we are doing pokes on the Obelisk database engine.
+
 \begin{lstlisting}
-#include <stdio.h>
-
-double compute(float a, float b) {
-    return a * a + b * b;
-}
-
-int main() {
-    float x = 2.5;
-    float y = 3.7;
-
-    double result = compute(x, y);
-
-    printf("Result: %lf\n", result);
-
-    return 0;
-}
+::
+::  Build an example bowl manually
+++  bowl
+  |=  [run=@ud now=@da]
+  ^-  bowl:gall
+  :*  [~zod ~zod %obelisk `path`(limo `path`/test-agent)]  :: (our src dap sap)
+      [~ ~ ~]                                              :: (wex sup sky)
+      [run `@uvJ`(shax run) now [~zod %base ud+run]]       :: (act eny now byk)
+  ==
 \end{lstlisting}
 
 \noindent
-That code snippet was part of the text, and not a standalone entity to which we make separate repeated reference.
+Now we are ready to test the evolution through time of a database, as in Listing~\ref{lst:evolution}.
 
-\begin{figure}
-  \begin{lstlisting}[language=Python, caption={Example Python Code}, label={lst:example}]
-  def hello_world():
-      print("Hello, world!")
-  \end{lstlisting}
-\end{figure}
+\begin{lstlisting}[
+  float,
+  style=listingcode,
+  caption={Sequent tests},
+  label={lst:evolution}
+]e
+::
+::  time, insert as of 1 second > schema
+++  test-time-insert-gt-schema
+  =|  run=@ud
+  =^  mov1  agent  
+    %:  ~(on-poke agent (bowl [run ~2000.1.1]))
+        %obelisk-action
+        !>([%tape-create-db "CREATE DATABASE db1"])
+    ==
+  =.  run  +(run)
+  =^  mov2  agent  
+    %:  ~(on-poke agent (bowl [run ~2000.1.2]))
+        %obelisk-action
+        !>  :+  %tape
+                %db1
+                "CREATE TABLE db1..my-table (col1 @t) PRIMARY KEY (col1) ".
+                "AS OF ~2023.7.9..22.35.35..7e90"
+    ==
+  =.  run  +(run)
+  =^  mov3  agent  
+    %:  ~(on-poke agent (bowl [run ~2023.7.9..22.35.35..7e90]))
+        %obelisk-action
+        !>  :+  %tape 
+                %db1 
+                "INSERT INTO db1..my-table (col1) VALUES ('cord') ".
+                "AS OF ~2023.7.9..22.35.36..7e90"
+    ==
+  =+  !<(=state on-save:agent)
+  ;:  weld
+  %+  expect-eq
+    !>  :-  %results
+          :~  [%result-da 'data time' ~2023.7.9..22.35.36..7e90]
+              [%result-ud 'row count' 1]
+              ==
+    !>  ->+>+>.mov3
+  %+  expect-eq
+    !>  db-time-insert-tbl
+    !>  databases.state
+  ==
+\end{lstlisting}
 
-Refer to the code listing: Listing~\ref{lst:example}.  (Note that we don't suppress indentation since it's a float.)
+Under the covers the Obelisk engine calls out to the urQL parser to create AST commands from the user-created scripts. The \texttt{AS OF} clause overrides the time passed in the bowl. Finally we weld together two results and check them against what we expect. The first check, expect-eq, is of the metadata returned by the last command. The second check is the final database state after the evolution.
+
+Unit testing purism insists on specifically tailoring each test to one specific case of potential failure. This approach tends to be pedantic and frequently we pragmatically sneak in multiple independent tests in one test bundle, as in Listing~\ref{lst:bundle}.
+
+\begin{lstlisting}[
+  float,
+  style=listingcode,
+  caption={Multiple tests in one bundle},
+  label={lst:bundle}
+]
+::
+:: common things to test
+:: 1) basic command works producing AST object
+:: 2) multiple ASTs
+:: 3) all keywords are case ambivalent
+:: 4) all names follow rules for faces
+:: 5) all qualifier combinations work
+::
+:: alter index
+::
+:: tests 1, 2, 3, 5
+::       extra whitespace characters
+::       multiple command script:
+::         alter index... db.ns.index db.ns.table columns action %disable
+::         alter index db..index db..table one column action %rebuild
+++  test-alter-index-1
+  =/  expected1
+    :*  %alter-index
+        [%qualified-object ship=~ database='db' namespace='ns' name='my-index'] 
+        [%qualified-object ship=~ database='db' namespace='ns' name='table']
+        :~  [%ordered-column name='col1' is-ascending=%.y]
+            [%ordered-column name='col2' is-ascending=%.n]
+            [%ordered-column name='col3' is-ascending=%.y]
+            ==
+        %disable
+        ==
+  =/  expected2
+    :*  %alter-index
+        [%qualified-object ship=~ database='db' namespace='dbo' name='my-index']
+        [%qualified-object ship=~ database='db' namespace='dbo' name='table']
+        ~[[%ordered-column name='col1' is-ascending=%.y]]
+        %rebuild
+        ==
+  %+  expect-eq
+    !>  ~[expected1 expected2]
+    !>  %-  parse:parse(default-database 'db1')
+      "aLter \0d INdEX\09db.ns.my-index On db.ns.table  ".
+      "( col1  asc , col2\0a desc  , col3) \0a dIsable \0a;\0a aLter \0d ".
+      "INdEX\09db..my-index On db..table  ( col1  asc ) \0a \0a rEBuild "
+\end{lstlisting}
+
+\noindent
+As you can see, there was quite a bit tested in \texttt{test-alter-index-1} above. Things like whitespace and mixed-case labels are tedious to exhaustively test and well-suited to property based testing software like \texttt{\%quiz} (see below).
 
 
-\section{A Wild Ernest Appears}
+\section{Proof by Induction}
 
-You can have as many sections as make sense.  Only sections and subsections appear in the table of contents.
+We were intentionally dismissive of testing methodologies above because they are mere conventions. There is however some actual theory we can leverage in figuring out what and how to test.\footnote{\citet{TODO} provides a technical exposition of mathematical induction. You can skip it because we will explain it non-rigorously for lay programmers. We also quibble about the inclusion of zero as a natural number. While old school maths started the natural numbers with "1", but computer science has since infected maths. Have you ever seen zero of anything? No, it is not natural at all. Zero is a very, very special number.2 It's an abstraction that does not map to anything in the physical world.}
+
+Peano arithmetic is a better lay programmer's introduction to proof by induction. There exists (or perhaps \emph{does not exist}) a special concept, zero. Playing fast and loose with classical logic, “ex nihil sequitur quodlibet”, from nothing (more commonly a falsehood, or a contradiction) follows everything (i.e. anything).\footnote{The “principle of explosion” rigorously follows from use of disjunctive syllogisms.  Here, we jocosely indicate that by proceeding from zero inductively we can demonstrate desired properties of testing.} Zero is not only an integer; rather, in terms of Nock-based programming, \lstinline[style=inlinecode]{~} is not only the beginning of counting,\footnote{Yarvin opted to invert \texttt{true} and \texttt{false} (e.g. \texttt{urbit/vere} commit \texttt{a8c1a799}, 2014-11-04), meaning that Nock loobeans do not align inductively with other inductive types.} but the nothing of every inductive type, most importantly trees and lists. When speaking to programmers, Peano tells us there is a universal nothing \lstinline[style=inlinecode]{~} and there is a function called successor $\textrm{Succ}$, which produces some next thing from a previous thing (or lack of thing). Applying $\textrm{Succ}$ to nothing gives us the first thing.  Applying $\textrm{Succ}$ to the first thing gives us the second thing, and so on.
+
+Induction appears in unexpected places—think zero-length strings, which do not appear to involve \lstinline[style=inlinecode]{~} at all. For instance, the Hoon type \texttt{unit} is also an inductive type: it is literally either nothing or something. Knowing now what to look for, see where you can find induction in your own code.
+
+What does induction have to do with testing, however?  For inductive types—and simple functions over inductive types—the software author only has to prove, or test, two cases:  the case for zero and the case for the successor value after zero.  For example, Listing~\ref{lst:sequent} depicts tests for a gate over an inductive type (\texttt{list}) in \texttt{/lib/seq} (\citet{FoxSequent}, currently distributed via \texttt{\%yard} \citep{UrbitYard}).
+
+\begin{lstlisting}[
+  float,
+  style=listingcode,
+  caption={Sequent tests},
+  label={lst:sequent}
+]
+::
+::  +contains
+++  test-contains-00
+  %+  expect-eq
+    !>  %.n
+    !>  (contains `(list)`~ "yep")
+++  test-contains-01
+  %+  expect-eq
+    !>  %.y
+    !>  (contains `(list @)`~[1] 1) 
+++  test-contains-example-00
+  %+  expect-eq
+    !>  %.y
+    !>  (contains `(list tape)`~["nope" "yep"] "yep")
+\end{lstlisting}
+
+``Hey'', you say—``that's more than two tests.''  That's right:  two is the bare minimum of required tests, and only applies to the simplest units of inductive testing. In this case the first two tests suffice, but minimal tests frequently make for unhelpful documentation examples. We heartily recommend providing interesting examples in your documentation and including those examples in your test suite. You don't want users to struggle with examples that don't work, or worse, don't even build. More tests don't hurt anything; the computer doesn't get tired.
+
+Another reason for additional tests is taking a page out of ``white box'' or ``gray box'' testing. If you know that there is special logic for the first successor case, you need to test the first case independently as well as a subsequent successor. If you are the programmer and the tester you should approach all of your testing from this perspective. You might even see how to make your program simpler.
+
+\subsection{The First Cartesian Explosion}
+
+Through the mathematics of currying programmatic functions, we can have input arguments of multiple inductive types.\footnote{While most programming languages handle multiple function inputs via currying, Hoon gates always accept a single noun, which can be a cell.  So in this case the currying is not even theoretical.}  This results in the minimum number of tests being the number of inductive input elements squared, starting with all elements set to \lstinline[style=inlinecode]{~} and so forth.  Listing~\ref{lst:single} depicts a series of tests for the \texttt{append} gate subject to this $n^2$ explosion.
+
+\begin{lstlisting}[
+  float,
+  style=listingcode,
+  caption={Multiple single tests},
+  label={lst:single}
+]
+::
+::  +append
+++  test-append-00
+  %+  expect-eq
+    !>  ~
+    !>  (append ~ ~)
+++  test-append-01
+  %+  expect-eq
+    !>  ~[1]
+    !>  (append ~[1] `(list)`~)
+++  test-append-02
+  %+  expect-eq
+    !>  ~[1]
+    !>  (append ~ ~[1])
+++  test-append-03
+  %+  expect-eq
+    !>  ~[1 2]
+    !>  (append ~[1] ~[2])
+\end{lstlisting}
+
+In this situation, the required number of tests may grow exponentially but in most practical cases remains a relatively small finite number.
+
+\subsection{The Second Cartesian Explosion}
+
+Input argument interactions are not the only source of combinatorial explosion in testing. Imagine that your function (gate) is a black box. You start submitting random input to figure out what the underlying algorithm is. However, it turns out that you discover that there is not one consistent algorithm for all inputs. Some values or ranges of values behave differently from others. (Unexpected UTF-8 whitespace characters are notorious for revealing head-scratching bugs—so imagine all possible inputs over complex XML.) You could model this behavior as multiple inductive types making for an even bigger cartesian explosion of inputs to test. It is no longer practical to construct all the tests required by our theory. The number is still finite, but impractically large. What is to be done?
+
+There is no general solution. Complete code coverage with tests is a start, inductively testing over each clause in a unit. This is time-consuming and requires thinking deeply about the code and its structure.
+
+Another approach is to favor so-called edge case testing, in which you test the boundaries of the input space. This is a good idea, but it is not a complete solution. It is not always clear what the edge is, and it is not always clear that the edge is the same for all inductive types. In the case of testing a string function, should an edge be the empty string, a string with one character, or a string with two characters? 
+
+An automated testing solution called property-based testing may be applicable in these cases. The idea of property-based testing is to develop and instantiate invariant properties of the code and let software generate random inputs. The software runs the random inputs and tests the outputs against the invariant properties. An architecture for this approach was originally developed for Haskell and has since ported to many other languages, including Hoon.  \texttt{\%quiz} is a well-documented Hoon implementation \citep{Hjort2023}.  Once again, this solution requires some deep thinking about the code and its specification.
+
+From our experience with the F\# implementation of property-based testing, we expect that you will need to boost the number of random input permutations beyond the default of 100 to get the kind of coverage that is ``reasonably'' exhaustive. We found 10,000 to be frequently adequate. (Since the inputs are randomly generated each run, however, a property test of production code may fail when nothing has changed. Then think about how to explain to your boss that your tests are not deterministic.)
+
+Lastly, whenever you fix a bona fide production bug (or one that a framework like \texttt{\%quiz} discovered), add a test case to address that circumstance. This not only provides the standard for when the bug has been fixed, but protects against regressing to the prior behavior (thus, a “regression test”). Congratulations, you have just refined your specification.
+
+\section{Testing Failure}
+
+In our experience failure modes are the most overlooked part of sofware development. It starts with passing insufficient, or no information from the programmed points of failure. So even before testing failure modes make sure you distinguish (i.e. make unique) each message from every point of failure and include any and all relevant information available for debugging.
+
+\begin{lstlisting}  
+~|("cannot add duplicate key: {<row-key>}" !!)
+\end{lstlisting}
+
+The standard \texttt{/lib/test} library, as of this writing, can test for failure but not for an expected message.  A modified testing arm (Listing~\ref{lst:error}) can be included in a testing thread to facilitate this kind of testing.  Listing~\ref{lst:urql} shows a test for an expected error message in the urQL database engine which uses this functionality to verify that the correct error message is raised on crash.
+
+\begin{lstlisting}[
+  float,
+  style=listingcode,
+  caption={Testing for expected error message},
+  label={lst:error}
+]
+::
+::  +expect-fail-message
+++  expect-fail-message
+  |=  [msg=@t a=(trap)]
+  ^-  tang
+  =/  b  (mule a)
+  ?-  -.b
+    %|  |^
+        =/  =tang  (flatten +.b)
+        ?:  ?=(^ (find (trip msg) tang))
+          ~
+        ['expected error message - not found' ~]
+        ++  flatten
+          |=  tang=(list tank)
+          =|  res=tape
+          |-  ^-  tape
+          ?~  tang  res
+          $(tang t.tang, res (weld ~(ram re i.tang) res))
+        --
+    %&  ['expected failure - succeeded' ~]
+  ==
+\end{lstlisting}
+
+\begin{lstlisting}[
+  float,
+  style=listingcode,
+  caption={urQL tests},
+  label={lst:urql}
+]
+::
+:: fail on dup rows
+++  test-fail-insert-dup-rows
+  =|  run=@ud
+  =/  my-insert
+    "INSERT INTO db1..my-table-3 (col1, col2, col3)  ".
+    "VALUES ('cord',~zod,20) ('Default',Default, 0)"
+  %+  expect-fail-message
+    'cannot add duplicate key:'
+  |.  %-  process-cmds
+      :+  gen3-dbs  :: <- one key already exists
+        (bowl [run ~2031.1.1])
+      (parse:parse(default-database 'db1') my-insert)
+\end{lstlisting}
 
 \section{Conclusion}
 
-To summarize, why did you write it?  Why do we care?  What impact should it have on Urbit development?
+Keep the following principles in mind when producing and evaluating code as a software developer.
 
-Your bibliography is a separate BibTeX file.  We use the \texttt{plainnat} bibliography style.  You can use \texttt{natbib} citation commands like \texttt{\textbackslash citep\{wikipedia\}} for parenthesized references.  Use \texttt{\textbackslash citet\{wikipedia\}} for inline references.  You can also use \texttt{\textbackslash citeauthor\{wikipedia\}} for the principal author's name.
-
-``You can use traditional TeX---or LaTeX---representations'' \citep{Varney1987}.
-
-“Or you can use fancy quotes—and symbols.”
+\begin{enumerate}
+  \item  Strive to make the collection of units of testing exhaustive, both primitive units of code and units of work from the user perspective.
+  \item  Test inductively wherever possible.
+  \item  Test from a white or gray box perspective.
+  \item  Test the failure modes.
+  \item  Test all the examples in your documentation.
+  \item  In a world lacking documentation tests may be the only real specification.\footnote{Cf. the definition by \citeauthor[p. xvi]{Feathers2005} that “legacy code is simply code without tests.”  The entire text may thus be commended as a thorough guide to testing despite its name.}
+  \item  Regression tests are the key to refactoring with confidence. Beautiful code comes from refactoring.
+\end{enumerate}
 
 \printbibliography
 \end{document}
