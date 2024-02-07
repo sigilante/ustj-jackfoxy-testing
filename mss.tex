@@ -70,11 +70,9 @@ Descending from the hypothetical to the practical, every practical programming l
 
 Don't get hung up on unit testing dogma. A unit is whatever you want it to be. As a subject-oriented programming language, Hoon does not support private properties and functions: every arm and core in your software is accessible for testing. Generally a unit is some self-contained level of functionality, either from the programmer's or the user's point of view.
 
-Here's an extreme unit test, some may even say it is not a unit test, but an integration test (or something else).
+Here's a more extreme unit test (which some may even prefer to call an integration test):
 
-First, we need to build out a little more infrastructure, because we are doing pokes on the Obelisk database engine.
-
-\begin{lstlisting}
+\begin{lstlisting}[style=listingcode]
 ::
 ::  Build an example bowl manually
 ++  bowl
@@ -87,14 +85,9 @@ First, we need to build out a little more infrastructure, because we are doing p
 \end{lstlisting}
 
 \noindent
-Now we are ready to test the evolution through time of a database, as in Listing~\ref{lst:evolution}.
+Now we are ready to test the evolution through time of a database.
 
-\begin{lstlisting}[
-  float,
-  style=listingcode,
-  caption={Sequent tests},
-  label={lst:evolution}
-]e
+\begin{lstlisting}[style=listingcode]
 ::
 ::  time, insert as of 1 second > schema
 ++  test-time-insert-gt-schema
@@ -144,9 +137,9 @@ Unit testing purism insists on specifically tailoring each test to one specific 
   float,
   style=listingcode,
   caption={Multiple tests in one bundle},
+  escapeinside=``,
   label={lst:bundle}
 ]
-::
 :: common things to test
 :: 1) basic command works producing AST object
 :: 2) multiple ASTs
@@ -160,23 +153,48 @@ Unit testing purism insists on specifically tailoring each test to one specific 
 ::       extra whitespace characters
 ::       multiple command script:
 ::         alter index... db.ns.index db.ns.table columns action %disable
-::         alter index db..index db..table one column action %rebuild
+::         alter index db..index db..table one column
+::         action %rebuild
 ++  test-alter-index-1
   =/  expected1
     :*  %alter-index
-        [%qualified-object ship=~ database='db' namespace='ns' name='my-index'] 
-        [%qualified-object ship=~ database='db' namespace='ns' name='table']
-        :~  [%ordered-column name='col1' is-ascending=%.y]
-            [%ordered-column name='col2' is-ascending=%.n]
-            [%ordered-column name='col3' is-ascending=%.y]
+        :*  %qualified-object
+            ship=~ database='db'
+            namespace='ns' name='my-index'
+        ==
+        :*  %qualified-object
+            ship=~ database='db'
+            namespace='ns' name='table'
+        ==
+        :~  :*  %ordered-column
+                name='col1'
+                is-ascending=%.y
             ==
+            :*  %ordered-column
+                name='col2'
+                is-ascending=%.n
+            ==
+            :*  %ordered-column
+                name='col3'
+                is-ascending=%.y
+        ==  ==
         %disable
         ==
+  `\newpage`
   =/  expected2
     :*  %alter-index
-        [%qualified-object ship=~ database='db' namespace='dbo' name='my-index']
-        [%qualified-object ship=~ database='db' namespace='dbo' name='table']
-        ~[[%ordered-column name='col1' is-ascending=%.y]]
+        :*  %qualified-object
+            ship=~ database='db'
+            namespace='dbo' name='my-index'
+        ==
+        :*  %qualified-object
+            ship=~ database='db'
+            namespace='dbo' name='table'
+        ==
+        :~  :*  %ordered-column
+                name='col1'
+                is-ascending=%.y
+        ==  ==
         %rebuild
         ==
   %+  expect-eq
@@ -195,7 +213,7 @@ As you can see, there was quite a bit tested in \texttt{test-alter-index-1} abov
 
 We were intentionally dismissive of testing methodologies above because they are mere conventions. There is however some actual theory we can leverage in figuring out what and how to test.\footnote{\citet{TODO} provides a technical exposition of mathematical induction. You can skip it because we will explain it non-rigorously for lay programmers. We also quibble about the inclusion of zero as a natural number. While old school maths started the natural numbers with "1", but computer science has since infected maths. Have you ever seen zero of anything? No, it is not natural at all. Zero is a very, very special number.2 It's an abstraction that does not map to anything in the physical world.}
 
-Peano arithmetic is a better lay programmer's introduction to proof by induction. There exists (or perhaps \emph{does not exist}) a special concept, zero. Playing fast and loose with classical logic, “ex nihil sequitur quodlibet”, from nothing (more commonly a falsehood, or a contradiction) follows everything (i.e. anything).\footnote{The “principle of explosion” rigorously follows from use of disjunctive syllogisms.  Here, we jocosely indicate that by proceeding from zero inductively we can demonstrate desired properties of testing.} Zero is not only an integer; rather, in terms of Nock-based programming, \lstinline[style=inlinecode]{~} is not only the beginning of counting,\footnote{Yarvin opted to invert \texttt{true} and \texttt{false} (e.g. \texttt{urbit/vere} commit \texttt{a8c1a799}, 2014-11-04), meaning that Nock loobeans do not align inductively with other inductive types.} but the nothing of every inductive type, most importantly trees and lists. When speaking to programmers, Peano tells us there is a universal nothing \lstinline[style=inlinecode]{~} and there is a function called successor $\textrm{Succ}$, which produces some next thing from a previous thing (or lack of thing). Applying $\textrm{Succ}$ to nothing gives us the first thing.  Applying $\textrm{Succ}$ to the first thing gives us the second thing, and so on.
+Peano arithmetic is a better lay programmer's introduction to proof by induction. There exists (or perhaps \emph{does not exist}) a special concept, zero. Playing fast and loose with classical logic, “ex nihil sequitur quodlibet”, from nothing (more commonly a falsehood, or a contradiction) follows everything (i.e. anything).\footnote{The “principle of explosion” rigorously follows from use of disjunctive syllogisms.  Here, we jocosely indicate that by proceeding from zero inductively we can demonstrate desired properties of testing.} Zero is not only an integer; rather, in terms of Nock-based programming, \lstinline[style=inlinecode]{~} is not only the beginning of counting,\footnote{Yarvin opted to invert \texttt{true} and \texttt{false} (e.g. \texttt{urbit/vere} commit \texttt{a8c1a799}, 2014-11-04), meaning that Nock loobeans do not align inductively with other inductive types.} but the nothing of every inductive type, most importantly trees and lists. When speaking to programmers, Peano tells us there is a universal nothing \lstinline[style=inlinecode]{~} and there is a function called successor $\textrm{Succ}$, which produces some next thing from a previous thing (or lack of thing). Applying $\textrm{Succ}$ to nothing, $\textrm{Succ}(0)$, gives us the first thing.  Applying $\textrm{Succ}$ to the first thing, $\textrm{Succ}(\textrm{Succ}(0))$ gives us the second thing, and so on.
 
 Induction appears in unexpected places—think zero-length strings, which do not appear to involve \lstinline[style=inlinecode]{~} at all. For instance, the Hoon type \texttt{unit} is also an inductive type: it is literally either nothing or something. Knowing now what to look for, see where you can find induction in your own code.
 
@@ -277,7 +295,7 @@ Lastly, whenever you fix a bona fide production bug (or one that a framework lik
 
 In our experience failure modes are the most overlooked part of sofware development. It starts with passing insufficient, or no information from the programmed points of failure. So even before testing failure modes make sure you distinguish (i.e. make unique) each message from every point of failure and include any and all relevant information available for debugging.
 
-\begin{lstlisting}  
+\begin{lstlisting}[style=listingcode]
 ~|("cannot add duplicate key: {<row-key>}" !!)
 \end{lstlisting}
 
@@ -306,7 +324,10 @@ The standard \texttt{/lib/test} library, as of this writing, can test for failur
           =|  res=tape
           |-  ^-  tape
           ?~  tang  res
-          $(tang t.tang, res (weld ~(ram re i.tang) res))
+          %=  $
+            tang  t.tang
+            res   (weld ~(ram re i.tang) res)
+          ==
         --
     %&  ['expected failure - succeeded' ~]
   ==
@@ -323,7 +344,7 @@ The standard \texttt{/lib/test} library, as of this writing, can test for failur
 ++  test-fail-insert-dup-rows
   =|  run=@ud
   =/  my-insert
-    "INSERT INTO db1..my-table-3 (col1, col2, col3)  ".
+    "INSERT INTO db1..my-table (col1, col2, col3)  ".
     "VALUES ('cord',~zod,20) ('Default',Default, 0)"
   %+  expect-fail-message
     'cannot add duplicate key:'
