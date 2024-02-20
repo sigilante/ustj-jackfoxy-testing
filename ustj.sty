@@ -60,7 +60,7 @@
     upquote=true,
     breaklines=true,
     breakatwhitespace=true,
-    commentstyle=\color{Gray}\emph,
+    commentstyle=\color{darkgray}\emph,
     keywordstyle=\color{darkgray}\bfseries
 }
 \lstdefinestyle{listingcode}{
@@ -75,7 +75,7 @@
     showspaces=false,
     keepspaces,
     upquote=true,
-    commentstyle=\color{Gray}\emph,
+    commentstyle=\color{darkgray}\emph,
     keywordstyle=\color{darkgray}\bfseries
 }
 \lstdefinestyle{listingcode_python}{
@@ -90,7 +90,7 @@
     showspaces=false,
     keepspaces,
     upquote=true,
-    commentstyle=\color{Gray}\emph,
+    commentstyle=\color{darkgray}\emph,
     keywordstyle=\color{darkgray}\bfseries
 }
 \lstdefinestyle{listingcode_c}{
@@ -105,7 +105,7 @@
     showspaces=false,
     keepspaces,
     upquote=true,
-    commentstyle=\color{Gray}\emph,
+    commentstyle=\color{darkgray}\emph,
     keywordstyle=\color{darkgray}\bfseries
 }
 
@@ -160,3 +160,55 @@
  \printtext[bibhyperref]{\printfield{usera}}}
 {\multicitedelim}
 {\usebibmacro{postnote}}
+
+% Define the custom citation command for @online entries
+\DeclareCiteCommand{\customonlinecite}
+  {\usebibmacro{prenote}}
+  {\printnames{author}%
+   \setunit{\addcomma\space}%
+   \printfield{title}%
+   \setunit{\addcomma\space}%
+   (\printfield{year}).\space
+   \printfield{titleaddon}%
+   \setunit{\addperiod\space\textsc{url}\addcolon\space}%
+   \texttt{\url{\thefield{url}}}%
+   \setunit{\addspace(visited on\space}%
+   \printdate% Print the access date
+   \setunit{\addcomma\space}\bibstring{urlseen}\addperiod\space}%
+  {\multicitedelim}
+  {\usebibmacro{postnote}}
+
+% Use the custom citation command for @online entries
+\DeclareFieldFormat[online]{titleaddon}{#1} % Adjust the formatting of titleaddon
+\DeclareBibliographyDriver{online}{%
+  \usebibmacro{bibindex}%
+  \usebibmacro{begentry}%
+  \usebibmacro{author/editor}%
+  \setunit{\addspace}%
+  \usebibmacro{title}%
+  \newunit\newblock
+  \printfield{titleaddon}% Print titleaddon
+  \newunit\newblock
+  \usebibmacro{url+urldate}%
+  \newunit\newblock
+  \iftoggle{bbx:related}
+    {\usebibmacro{related:init}%
+     \usebibmacro{related}}
+    {}%
+  \usebibmacro{finentry}}
+
+% Define the custom citation command for @software entries
+\DeclareBibliographyDriver{software}{%
+  \usebibmacro{bibindex}%
+  \usebibmacro{begentry}%
+  \usebibmacro{author/editor}%
+  \setunit{\addspace}%
+  \usebibmacro{title}%
+  \newunit\newblock
+  \usebibmacro{url+urldate}%
+  \newunit\newblock
+  \iftoggle{bbx:related}
+    {\usebibmacro{related:init}%
+     \usebibmacro{related}}
+    {}%
+  \usebibmacro{finentry}}
