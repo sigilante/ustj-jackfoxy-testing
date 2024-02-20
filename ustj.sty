@@ -118,7 +118,7 @@
 \renewcommand{\maketitlehooka}{\urbitfont\bfseries}
 
 %% Page size
-\usepackage[paperheight=8.5in,paperwidth=5.5in,margin=1in,heightrounded,showframe]{geometry}
+\usepackage[paperheight=8.5in,paperwidth=5.5in,margin=1in,heightrounded]{geometry}
 
 %% Configure first-page footer and later-page header.
 \usepackage{fancyhdr}
@@ -130,8 +130,8 @@
 \newcommand{\github}[1]{\texttt{@#1}}
 
 % Turn off when producing release version.
-\usepackage{lineno}
-\linenumbers
+% \usepackage{lineno}
+% \linenumbers
 
 % Bibliography management
 \usepackage[
@@ -142,6 +142,7 @@
     url=false,
     eprint=false
 ]{biblatex}
+\usepackage[hidelinks]{hyperref}
 %\usepackage{natbib}
 % \usepackage[hyphens]{url}
 % Define a custom citation command for GitHub PRs
@@ -152,3 +153,10 @@
   {\multicitedelim}
   {\usebibmacro{postnote}}
 
+% Define a custom citation command for GitHub PRs
+\DeclareCiteCommand{\citetrepo}
+{\usebibmacro{prenote}}
+{\usebibmacro{citeindex}%
+ \printtext[bibhyperref]{\printfield{usera}}}
+{\multicitedelim}
+{\usebibmacro{postnote}}

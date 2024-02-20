@@ -14,8 +14,8 @@
 \fancyhead{}
 \fancyfoot[L]{{\footnotesize
               %% We toggle between these:
-              Manuscript submitted for review.\\
-              % {\it Urbit Systems Technical Journal} I:1 (2024):  1–3. \\
+              % Manuscript submitted for review.\\
+              {\it Urbit Systems Technical Journal} I:1 (2024):  20–23. \\
               ~ \\
               Address author correspondence to \authorpatp.
               }}
@@ -23,11 +23,11 @@
 %  Arrange subsequent pages:
 \fancyhf{}
 \fancyhead[LE]{{\urbitfont Urbit Systems Technical Journal}}
-\fancyhead[RO]{What Should I Test?}
+\fancyhead[RO]{A Philosophy of (Inductive) Testing}
 \fancyfoot[LE,RO]{\thepage}
 
 %%MANUSCRIPT
-\title{What Should I Test?}
+\title{A Philosophy of (Inductive) Testing}
 \author{\authorname~\authorpatp \\ \affiliation}
 \date{}
 
@@ -139,7 +139,7 @@ Listing \ref{lst:inttest} depicts a more thorough unit test for working with a G
   ==  :: weld
 \end{lstlisting}
 
-Under the covers the Obelisk engine calls out to the urQL parser to create AST commands from the user-created scripts. The \texttt{AS OF} clause overrides the time passed in the bowl. Finally we weld together two results and check them against what we expect. The first check, expect-eq, is of the metadata returned by the last command. The second check is the final database state after the evolution.
+Under the hood, the Obelisk engine calls out to the urQL parser to create AST commands from the user-created scripts. The \texttt{AS OF} clause overrides the time passed in the bowl. Finally we weld together two results and check them against what we expect. The first check, expect-eq, is of the metadata returned by the last command. The second check is the final database state after the evolution.
 
 Unit testing purism insists on specifically tailoring each test to one specific case of potential failure. This approach tends to be pedantic and frequently we pragmatically sneak in multiple independent tests in one test bundle, as in Listing~\ref{lst:bundle}.  \texttt{++test-alter-index-1} is not an atomic unit test but tests several qualities together. Values like whitespace and mixed-case labels are tedious to exhaustively test and well-suited to property based testing software like \texttt{\%quiz} (see below).
 
@@ -234,11 +234,11 @@ Unit testing purism insists on specifically tailoring each test to one specific 
 
 We were intentionally dismissive of testing methodologies above because they are mere conventions. There is however some actual theory we can leverage in figuring out what and how to test.\footnote{\citet{WikipediaInduction} provides a modestly technical exposition of mathematical induction. You can skip it because we will explain it non-rigorously for lay programmers. We also quibble about the inclusion of zero as a natural number. While old school maths started the natural numbers with "1", but computer science has since infected maths. Have you ever seen zero of anything? No, it is not natural at all. Zero is a very, very special number.2 It's an abstraction that does not map to anything in the physical world.}
 
-Peano arithmetic is a better lay programmer's introduction to proof by induction. There exists (or perhaps \emph{does not exist}) a special concept, zero. Playing fast and loose with classical logic, “ex nihil sequitur quodlibet”, from nothing (more commonly a falsehood, or a contradiction) follows everything (i.e. anything).\footnote{The “principle of explosion” rigorously follows from use of disjunctive syllogisms.  Here, we jocosely indicate that by proceeding from zero inductively we can demonstrate desired properties of testing.} Zero is not only an integer; rather, in terms of Nock-based programming, \lstinline[style=inlinecode]{~} is not only the beginning of counting,\footnote{Yarvin opted to invert \texttt{true} and \texttt{false} \citep{Yarvin2006}, meaning that Nock loobeans do not align inductively with other inductive types.} but the nothing of every inductive type, most importantly trees and lists. When speaking to programmers, Peano tells us there is a universal nothing \lstinline[style=inlinecode]{~} and there is a function called successor $\textrm{Succ}$, which produces some next thing from a previous thing (or lack of thing). Applying $\textrm{Succ}$ to nothing, $\textrm{Succ}(0)$, gives us the first thing.  Applying $\textrm{Succ}$ to the first thing, $\textrm{Succ}(\textrm{Succ}(0))$ gives us the second thing, and so on.
+Peano arithmetic is a better lay programmer's introduction to proof by induction. There exists (or perhaps \emph{does not exist}) a special concept, zero. Playing fast and loose with classical logic, “ex nihil sequitur quodlibet”, from nothing (more commonly a falsehood, or a contradiction) follows everything (i.e. anything).\footnote{The “principle of explosion” rigorously follows from use of disjunctive syllogisms.  Here, we jocosely indicate that by proceeding from zero inductively we can demonstrate desired properties of testing.} Zero is not only an integer; rather, in terms of Nock-based programming, \lstinline[style=inlinecode]{~} is not only the beginning of counting,\footnote{Yarvin opted to invert \texttt{true} (as 0) and \texttt{false} (as 1) \citep{Yarvin2006}, meaning that Nock loobeans do not align inductively with other inductive types.} but the nothing of every inductive type, most importantly trees and lists. When speaking to programmers, Peano tells us there is a universal nothing \lstinline[style=inlinecode]{~} and there is a function called successor $\textrm{Succ}$, which produces some next thing from a previous thing (or lack of thing). Applying $\textrm{Succ}$ to nothing, $\textrm{Succ}(0)$, gives us the first thing.  Applying $\textrm{Succ}$ to the first thing, $\textrm{Succ}(\textrm{Succ}(0))$ gives us the second thing, and so on.
 
 Induction appears in unexpected places—think zero-length strings, which do not appear to involve \lstinline[style=inlinecode]{~} at all. For instance, the Hoon type \texttt{unit} is also an inductive type: it is literally either nothing or something. Knowing now what to look for, see where you can find induction in your own code.
 
-What does induction have to do with testing, however?  For inductive types—and simple functions over inductive types—the software author only has to prove, or test, two cases:  the case for zero and the case for the successor value after zero.  For example, Listing~\ref{lst:sequent} depicts tests for a gate over an inductive type (\texttt{list}) in \texttt{/lib/seq} (\citet{FoxSequent}, currently distributed via \texttt{\%yard} \citep{UrbitYard}).
+What does induction have to do with testing, however?  For inductive types—and simple functions over inductive types—the software author only has to prove, or test, two cases:  the case for zero and the case for the successor value after zero.  For example, Listing~\ref{lst:sequent} depicts tests for a gate over an inductive type (\texttt{list}) in \texttt{/lib/seq} (\citetrepo{FoxSequent}, currently distributed via \texttt{\%yard} (\citetrepo{UrbitYard})).
 
 \begin{lstlisting}[
   float,
@@ -306,7 +306,7 @@ There is no general solution. Complete code coverage with tests is a start, indu
 
 Another approach is to favor so-called edge case testing, in which you test the boundaries of the input space. This is a good idea, but it is not a complete solution. It is not always clear what the edge is, and it is not always clear that the edge is the same for all inductive types. In the case of testing a string function, should an edge be the empty string, a string with one character, or a string with two characters? 
 
-An automated testing solution called property-based testing may be applicable in these cases. The idea of property-based testing is to develop and instantiate invariant properties of the code and let software generate random inputs. The software runs the random inputs and tests the outputs against the invariant properties. An architecture for this approach was originally developed for Haskell and has since ported to many other languages, including Hoon.  \texttt{\%quiz} is a well-documented Hoon implementation \citep{Hjort2023}.  Once again, this solution requires some deep thinking about the code and its specification.
+An automated testing solution called property-based testing may be applicable in these cases. The idea of property-based testing is to develop and instantiate invariant properties of the code and let software generate random inputs. The software runs the random inputs and tests the outputs against the invariant properties. An architecture for this approach was originally developed for Haskell and has since ported to many other languages, including Hoon.  \texttt{\%quiz} is a well-documented Hoon implementation \citetrepo{Hjort2023}.  Once again, this solution requires some deep thinking about the code and its specification.
 
 From our experience with the F\# implementation of property-based testing, we expect that you will need to boost the number of random input permutations beyond the default of 100 to get the kind of coverage that is ``reasonably'' exhaustive. We found 10,000 to be frequently adequate. (Since the inputs are randomly generated each run, however, a property test of production code may fail when nothing has changed. Then think about how to explain to your boss that your tests are not deterministic.)
 
