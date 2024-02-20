@@ -6,6 +6,7 @@
 \usepackage{amsfonts}
 \usepackage{amsmath}
 \usepackage{graphicx}
+\usepackage{calc} % for \heightof in \tombstone
 
 \usepackage{mathspec}
 \setmainfont{Linux Libertine O}
@@ -60,7 +61,7 @@
     upquote=true,
     breaklines=true,
     breakatwhitespace=true,
-    commentstyle=\color{darkgray}\emph,
+    commentstyle=\color{Gray}\emph,
     keywordstyle=\color{darkgray}\bfseries
 }
 \lstdefinestyle{listingcode}{
@@ -75,7 +76,7 @@
     showspaces=false,
     keepspaces,
     upquote=true,
-    commentstyle=\color{darkgray}\emph,
+    commentstyle=\color{Gray}\emph,
     keywordstyle=\color{darkgray}\bfseries
 }
 \lstdefinestyle{listingcode_python}{
@@ -90,7 +91,7 @@
     showspaces=false,
     keepspaces,
     upquote=true,
-    commentstyle=\color{darkgray}\emph,
+    commentstyle=\color{Gray}\emph,
     keywordstyle=\color{darkgray}\bfseries
 }
 \lstdefinestyle{listingcode_c}{
@@ -105,7 +106,7 @@
     showspaces=false,
     keepspaces,
     upquote=true,
-    commentstyle=\color{darkgray}\emph,
+    commentstyle=\color{Gray}\emph,
     keywordstyle=\color{darkgray}\bfseries
 }
 
@@ -116,6 +117,8 @@
 \titleformat{\subsection}{\urbitfont\Large\bfseries}{\thesubsection}{1em}{}
 \usepackage{titling}
 \renewcommand{\maketitlehooka}{\urbitfont\bfseries}
+% Redefine the format of the abstract heading to make it invisible
+\AtBeginDocument{\renewcommand{\abstractname}{}}
 
 %% Page size
 \usepackage[paperheight=8.5in,paperwidth=5.5in,margin=1in,heightrounded]{geometry}
@@ -126,7 +129,7 @@
 \setlength{\headheight}{15.2pt}
 \pagestyle{fancy}
 
-\newcommand{\patp}[1]{\texttt{\textasciitilde #1}}
+\newcommand{\patp}[1]{\texttt{\textasciitilde#1}}
 \newcommand{\github}[1]{\texttt{@#1}}
 
 % Turn off when producing release version.
@@ -212,3 +215,5 @@
      \usebibmacro{related}}
     {}%
   \usebibmacro{finentry}}
+
+\newcommand{\tombstone}{\resizebox{!}{\heightof{T}}{\includegraphics{ustj-logo}}}
