@@ -37,7 +37,7 @@
 \thispagestyle{firststyle}
 
 \begin{abstract}
-Testing, including unit testing, forms a critical step in software development.  This article explores the philosophy and practice of testing in the context of Hoon and Urbit development, particularly as motivated by the development of urQL and Obelisk.  Principles and best practices are suggested, as well as a practical example of testing in Hoon.
+Testing, including unit testing, forms a critical step in software development.  This article explores the philosophy and practice of testing in the context of Hoon and Urbit development, particularly as motivated by the development of urQL and Obelisk.  Inductive testing provides an efficient yet complete basis for verifying code behavior.  Principles and best practices are suggested, as well as a practical example of testing in Hoon.
 \end{abstract}
 
 % We will adjust page numbering in final editing.
@@ -46,50 +46,60 @@ Testing, including unit testing, forms a critical step in software development. 
 
 \tableofcontents
 
-What should I test?
+\section{Introduction}
 
-Everything.  If you don't test it, it doesn't work.
+What should I test?  The short answer is, “Everything”.  If you don't test it, it doesn't work.
 
-\section{What does “test everything” even mean?}
-
-\emph{Everything} raises more questions than it answers. However, they fall into two categories, what and how.
+However, \emph{everything} raises more questions than it answers. Such questions fall into two categories, what and how.
 
 No one writes non-trivial software without testing, even if you come to believe that if it builds, it works. The first time you ran your software was a test. Chances are, you ran individual components to see if those worked. Why not take the extra few minutes to record those tests and results? With practice you will get smart about efficiently recording your throw-away tests. And after you read this I hope you will have a new appreciation of why it is worth the extra time to record your tests.
 
-\section{What test framework should I use?}
+\section{Testing Frameworks}
 
-Use what is useful and don't get hung-up on a particular framework or methodology. Record tests as you develop. You may think this slows down your development. That's not necessarily a bad thing. You will move forward with confidence that the last thing you worked on really works and you will find yourself thinking through your specification at a deeper level. This is important in a world of mostly incomplete and nebulous specs. What I am driving at is a sort of cousin to Test Driven Development. Think of it as real-time test development.
+Use what is useful and don't get hung-up on a particular framework or methodology. Record tests as you develop. You may think this slows down your development. That's not necessarily a bad thing. You will move forward with confidence that the last thing you worked on really works and you will find yourself thinking through your specification at a deeper level. This is important in a world of mostly incomplete and nebulous specs. What I am driving at is a cousin to test-driven development.\footnote{\citet{Beck2023} summarizes the principles of \textsc{tdd}.} Think of it as real-time test development.
 
 Your test suite has two important non-obvious functions, as regression tests (OK, this one should be obvious) and as part of your specification. If an existing test starts failing, carefully consider Chesterton's fence \citep{WikipediaChesterton} before taking the easy road and removing the test.
 
 Regression tests are important not just to prevent unexpectedly breaking functionality, but to allow you to refactor with confidence. Great software is the result of constant refactoring.
 
-\section{What is a unit, anyway?}
+\section{“Unit” Testing}
 
-Descending from the hypothetical to the practical, every practical programming language comes with a unit testing environment. In Hoon, this is \texttt{/lib/test/hoon} on the \texttt{\%base} desk. Copy it to \texttt{/lib} in your development desk. Here is an article on working with it. The rest of this article assumes a working knowledge of \texttt{/lib/test/hoon}.
+Descending from the hypothetical to the practical, every practical programming language comes with a unit testing environment. Hoon supplies \texttt{/lib/test} on the \texttt{\%base} desk, paired with the \texttt{/ted/test} thread; the \texttt{/lib} file should be copied to your development desk.\footnote{\citet{Davis2022} discusses this procedure in detail.} The rest of this article assumes a working knowledge of \texttt{/lib/test}.
 
 Don't get hung up on unit testing dogma. A unit is whatever you want it to be. As a subject-oriented programming language, Hoon does not support private properties and functions: every arm and core in your software is accessible for testing. Generally a unit is some self-contained level of functionality, either from the programmer's or the user's point of view.
 
-Here's a more extreme unit test (which some may even prefer to call an integration test):
+Listing \ref{lst:inttest} depicts a more thorough unit test for working with a Gall agent.  (Some would prefer to call this an \emph{integration test}.)  Given that level of granularity, we can proceed to test the evolution of a database over time (Listing \ref{lst:dbtime}).  The test is a bit more complex, but the principle holds constant:  test a unit of functionality.
 
-\begin{lstlisting}[style=listingcode]
+\begin{lstlisting}[
+  float,
+  style=listingcode,
+  caption={Agent-level test},
+  escapeinside=``,
+  label={lst:inttest}
+]
 ::
 ::  Build an example bowl manually
 ++  bowl
   |=  [run=@ud now=@da]
   ^-  bowl:gall
-  :*  [~zod ~zod %obelisk `path`(limo `path`/test-agent)]  :: (our src dap sap)
-      [~ ~ ~]                                              :: (wex sup sky)
-      [run `@uvJ`(shax run) now [~zod %base ud+run]]       :: (act eny now byk)
+  :*  :: (our src dap sap)
+      [~zod ~zod %obelisk `path`(limo `path`/test-agent)]
+      :: (wex sup sky)
+      [~ ~ ~]
+      :: (act eny now byk)
+      [run `@uvJ`(shax run) now [~zod %base ud+run]]
   ==
 \end{lstlisting}
 
-\noindent
-Now we are ready to test the evolution through time of a database.
-
-\begin{lstlisting}[style=listingcode]
-::
-::  time, insert as of 1 second > schema
+\begin{lstlisting}[
+  float,
+  style=listingcode,
+  caption={Testing database evolution over time},
+  escapeinside=``,
+  breaklines=true,
+  postbreak=\mbox{$\hookrightarrow$\space},
+  label={lst:dbtime}
+]
 ++  test-time-insert-gt-schema
   =|  run=@ud
   =^  mov1  agent  
@@ -101,19 +111,19 @@ Now we are ready to test the evolution through time of a database.
   =^  mov2  agent  
     %:  ~(on-poke agent (bowl [run ~2000.1.2]))
         %obelisk-action
-        !>  :+  %tape
+        !>  :+    %tape
                 %db1
-                "CREATE TABLE db1..my-table (col1 @t) PRIMARY KEY (col1) ".
-                "AS OF ~2023.7.9..22.35.35..7e90"
+              "CREATE TABLE db1..my-table (col1 @t) PRIMARY KEY (col1) ".
+            "AS OF ~2023.7.9..22.35.35..7e90"
     ==
   =.  run  +(run)
   =^  mov3  agent  
     %:  ~(on-poke agent (bowl [run ~2023.7.9..22.35.35..7e90]))
         %obelisk-action
-        !>  :+  %tape 
+        !>  :+    %tape 
                 %db1 
-                "INSERT INTO db1..my-table (col1) VALUES ('cord') ".
-                "AS OF ~2023.7.9..22.35.36..7e90"
+              "INSERT INTO db1..my-table (col1) VALUES ('cord') ".
+            "AS OF ~2023.7.9..22.35.36..7e90"
     ==
   =+  !<(=state on-save:agent)
   ;:  weld
@@ -121,23 +131,26 @@ Now we are ready to test the evolution through time of a database.
     !>  :-  %results
           :~  [%result-da 'data time' ~2023.7.9..22.35.36..7e90]
               [%result-ud 'row count' 1]
-              ==
+          ==
     !>  ->+>+>.mov3
   %+  expect-eq
     !>  db-time-insert-tbl
     !>  databases.state
-  ==
+  ==  :: weld
 \end{lstlisting}
 
 Under the covers the Obelisk engine calls out to the urQL parser to create AST commands from the user-created scripts. The \texttt{AS OF} clause overrides the time passed in the bowl. Finally we weld together two results and check them against what we expect. The first check, expect-eq, is of the metadata returned by the last command. The second check is the final database state after the evolution.
 
-Unit testing purism insists on specifically tailoring each test to one specific case of potential failure. This approach tends to be pedantic and frequently we pragmatically sneak in multiple independent tests in one test bundle, as in Listing~\ref{lst:bundle}.
+Unit testing purism insists on specifically tailoring each test to one specific case of potential failure. This approach tends to be pedantic and frequently we pragmatically sneak in multiple independent tests in one test bundle, as in Listing~\ref{lst:bundle}.  \texttt{++test-alter-index-1} is not an atomic unit test but tests several qualities together. Values like whitespace and mixed-case labels are tedious to exhaustively test and well-suited to property based testing software like \texttt{\%quiz} (see below).
 
 \begin{lstlisting}[
   float,
   style=listingcode,
-  caption={Multiple tests in one bundle},
+  caption={Multiple tests bundled together in one testing arm},
   escapeinside=``,
+  breaklines=true,
+  breakatwhitespace=true,
+  postbreak=\mbox{$\hookrightarrow$\space},
   label={lst:bundle}
 ]
 :: common things to test
@@ -152,7 +165,8 @@ Unit testing purism insists on specifically tailoring each test to one specific 
 :: tests 1, 2, 3, 5
 ::       extra whitespace characters
 ::       multiple command script:
-::         alter index... db.ns.index db.ns.table columns action %disable
+::         alter index... db.ns.index db.ns.table 
+::           columns action %disable
 ::         alter index db..index db..table one column
 ::         action %rebuild
 ++  test-alter-index-1
@@ -180,7 +194,18 @@ Unit testing purism insists on specifically tailoring each test to one specific 
         ==  ==
         %disable
         ==
-  `\newpage`
+\end{lstlisting}
+\begin{lstlisting}[
+  float,
+  style=listingcode,
+  escapeinside=``,
+  title={Listing~\ref{lst:bundle} continued},
+  nolol=true,
+  breaklines=true,
+  breakatwhitespace=true,
+  postbreak=\mbox{$\hookrightarrow$\space},
+  % label={lst:bundle-cont}
+]
   =/  expected2
     :*  %alter-index
         :*  %qualified-object
@@ -205,15 +230,11 @@ Unit testing purism insists on specifically tailoring each test to one specific 
       "INdEX\09db..my-index On db..table  ( col1  asc ) \0a \0a rEBuild "
 \end{lstlisting}
 
-\noindent
-As you can see, there was quite a bit tested in \texttt{test-alter-index-1} above. Things like whitespace and mixed-case labels are tedious to exhaustively test and well-suited to property based testing software like \texttt{\%quiz} (see below).
-
-
 \section{Proof by Induction}
 
-We were intentionally dismissive of testing methodologies above because they are mere conventions. There is however some actual theory we can leverage in figuring out what and how to test.\footnote{\citet{TODO} provides a technical exposition of mathematical induction. You can skip it because we will explain it non-rigorously for lay programmers. We also quibble about the inclusion of zero as a natural number. While old school maths started the natural numbers with "1", but computer science has since infected maths. Have you ever seen zero of anything? No, it is not natural at all. Zero is a very, very special number.2 It's an abstraction that does not map to anything in the physical world.}
+We were intentionally dismissive of testing methodologies above because they are mere conventions. There is however some actual theory we can leverage in figuring out what and how to test.\footnote{\citet{WikipediaInduction} provides a modestly technical exposition of mathematical induction. You can skip it because we will explain it non-rigorously for lay programmers. We also quibble about the inclusion of zero as a natural number. While old school maths started the natural numbers with "1", but computer science has since infected maths. Have you ever seen zero of anything? No, it is not natural at all. Zero is a very, very special number.2 It's an abstraction that does not map to anything in the physical world.}
 
-Peano arithmetic is a better lay programmer's introduction to proof by induction. There exists (or perhaps \emph{does not exist}) a special concept, zero. Playing fast and loose with classical logic, “ex nihil sequitur quodlibet”, from nothing (more commonly a falsehood, or a contradiction) follows everything (i.e. anything).\footnote{The “principle of explosion” rigorously follows from use of disjunctive syllogisms.  Here, we jocosely indicate that by proceeding from zero inductively we can demonstrate desired properties of testing.} Zero is not only an integer; rather, in terms of Nock-based programming, \lstinline[style=inlinecode]{~} is not only the beginning of counting,\footnote{Yarvin opted to invert \texttt{true} and \texttt{false} (e.g. \texttt{urbit/vere} commit \texttt{a8c1a799}, 2014-11-04), meaning that Nock loobeans do not align inductively with other inductive types.} but the nothing of every inductive type, most importantly trees and lists. When speaking to programmers, Peano tells us there is a universal nothing \lstinline[style=inlinecode]{~} and there is a function called successor $\textrm{Succ}$, which produces some next thing from a previous thing (or lack of thing). Applying $\textrm{Succ}$ to nothing, $\textrm{Succ}(0)$, gives us the first thing.  Applying $\textrm{Succ}$ to the first thing, $\textrm{Succ}(\textrm{Succ}(0))$ gives us the second thing, and so on.
+Peano arithmetic is a better lay programmer's introduction to proof by induction. There exists (or perhaps \emph{does not exist}) a special concept, zero. Playing fast and loose with classical logic, “ex nihil sequitur quodlibet”, from nothing (more commonly a falsehood, or a contradiction) follows everything (i.e. anything).\footnote{The “principle of explosion” rigorously follows from use of disjunctive syllogisms.  Here, we jocosely indicate that by proceeding from zero inductively we can demonstrate desired properties of testing.} Zero is not only an integer; rather, in terms of Nock-based programming, \lstinline[style=inlinecode]{~} is not only the beginning of counting,\footnote{Yarvin opted to invert \texttt{true} and \texttt{false} \citep{Yarvin2006}, meaning that Nock loobeans do not align inductively with other inductive types.} but the nothing of every inductive type, most importantly trees and lists. When speaking to programmers, Peano tells us there is a universal nothing \lstinline[style=inlinecode]{~} and there is a function called successor $\textrm{Succ}$, which produces some next thing from a previous thing (or lack of thing). Applying $\textrm{Succ}$ to nothing, $\textrm{Succ}(0)$, gives us the first thing.  Applying $\textrm{Succ}$ to the first thing, $\textrm{Succ}(\textrm{Succ}(0))$ gives us the second thing, and so on.
 
 Induction appears in unexpected places—think zero-length strings, which do not appear to involve \lstinline[style=inlinecode]{~} at all. For instance, the Hoon type \texttt{unit} is also an inductive type: it is literally either nothing or something. Knowing now what to look for, see where you can find induction in your own code.
 
@@ -299,7 +320,7 @@ In our experience failure modes are the most overlooked part of sofware developm
 ~|("cannot add duplicate key: {<row-key>}" !!)
 \end{lstlisting}
 
-The standard \texttt{/lib/test} library, as of this writing, can test for failure but not for an expected message.  A modified testing arm (Listing~\ref{lst:error}) can be included in a testing thread to facilitate this kind of testing.  Listing~\ref{lst:urql} shows a test for an expected error message in the urQL database engine which uses this functionality to verify that the correct error message is raised on crash.
+The standard \texttt{/lib/test} library, as of this writing, can test for failure but not for an expected message.  A modified testing arm (Listing~\ref{lst:error}) can be included in a testing thread to facilitate this kind of testing.  Listing~\ref{lst:urql} shows a test for an expected error message in the Obelisk database engine which uses this functionality to verify that the correct error message is raised on crash.
 
 \begin{lstlisting}[
   float,
@@ -336,7 +357,7 @@ The standard \texttt{/lib/test} library, as of this writing, can test for failur
 \begin{lstlisting}[
   float,
   style=listingcode,
-  caption={urQL tests},
+  caption={Obelisk database engine tests},
   label={lst:urql}
 ]
 ::
@@ -349,7 +370,7 @@ The standard \texttt{/lib/test} library, as of this writing, can test for failur
   %+  expect-fail-message
     'cannot add duplicate key:'
   |.  %-  process-cmds
-      :+  gen3-dbs  :: <- one key already exists
+      :+  gen3-dbs  :: <- key 'cord' already exists
         (bowl [run ~2031.1.1])
       (parse:parse(default-database 'db1') my-insert)
 \end{lstlisting}
