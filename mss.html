@@ -1,11 +1,13 @@
 <!DOCTYPE html> 
-<html lang="en-US" xml:lang="en-US" > 
+<html lang="en" xml:lang="en" > 
 <head><title>A Philosophy of (Inductive) Testing</title> 
 <meta  charset="utf-8" /> 
 <meta name="generator" content="TeX4ht (https://tug.org/tex4ht/)" /> 
 <meta name="viewport" content="width=device-width,initial-scale=1" /> 
 <link rel="stylesheet" type="text/css" href="mss.css" /> 
 <meta name="src" content="mss.tex" /> 
+<script>window.MathJax = { tex: { tags: "ams", }, }; </script> 
+ <script type="text/javascript" async="async" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"></script>  
 </head><body 
 >
    <div class="maketitle">
@@ -26,6 +28,8 @@ class="ec-lmbx-12">FoxyLabs</span></div><br />
    </div>
    <section role="doc-abstract" class="abstract"> 
 <h3 class="abstracttitle">
+<span 
+class="ec-lmbx-9">Abstract</span>
 </h3>
      <!--l. 40--><p class="noindent" ><span 
 class="ec-lmr-9">Testing, including unit testing, forms a critical step</span>
@@ -71,17 +75,17 @@ href="#x1-90006" id="QQ2-1-16">Conclusion</a></span>
 <br />    <span class="sectionToc" ><a 
 href="#x1-10000" id="QQ2-1-17">References</a></span>
    </div>
-<!--l. 49--><p class="noindent" >
+<!--l. 50--><p class="noindent" >
 </p>
    <h3 class="sectionHead"><span class="titlemark">1   </span> <a 
  id="x1-20001"></a>Introduction</h3>
-<!--l. 51--><p class="noindent" >What should I test? The short answer is, “Everything”. If you
+<!--l. 52--><p class="noindent" >What should I test? The short answer is, “Everything”. If you
 don’t test it, it doesn’t work.
-</p><!--l. 53--><p class="indent" >   However, <span 
+</p><!--l. 54--><p class="indent" >   However, <span 
 class="ec-lmri-10">everything </span>raises more questions than it
 answers. Such questions fall into two categories, what and
 how.
-</p><!--l. 55--><p class="indent" >   No one writes non-trivial software without testing, even if
+</p><!--l. 56--><p class="indent" >   No one writes non-trivial software without testing, even if
 you come to believe that if it builds, it works. The ﬁrst time
 you ran your software was a test. Chances are, you ran
 individual components to see if those worked. Why not take
@@ -90,13 +94,13 @@ practice you will get smart about eﬃciently recording your
 throw-away tests. And after you read this I hope you will have
 a new appreciation of why it is worth the extra time to record
 your tests.
-</p><!--l. 57--><p class="noindent" >
+</p><!--l. 58--><p class="noindent" >
 </p>
                                                 
                                                 
    <h3 class="sectionHead"><span class="titlemark">2   </span> <a 
  id="x1-30002"></a>Testing Frameworks</h3>
-<!--l. 59--><p class="noindent" >Use what is useful and don’t get hung-up on a particular
+<!--l. 60--><p class="noindent" >Use what is useful and don’t get hung-up on a particular
 framework or methodology. Record tests as you develop. You
 may think this slows down your development. That’s not
 necessarily a bad thing. You will move forward with conﬁdence
@@ -108,22 +112,20 @@ development.<span class="footnote-mark"><a
 href="mss2.html#fn1x0"><sup class="textsuperscript">1</sup></a></span><a 
  id="x1-3001f1"></a> 
 Think of it as real-time test development.
-</p><!--l. 61--><p class="indent" >   Your test suite has two important non-obvious functions,
-as regression tests (OK, this one should be obvious) and
-as part of your speciﬁcation. If an existing test starts
-failing, carefully consider Chesterton’s fence (<a 
- id="x1-3003"></a> Wikipedia,
-<a 
-href="#cite.0@WikipediaChesterton">2024a</a>) before taking the easy road and removing the
-test.
-</p><!--l. 63--><p class="indent" >   Regression tests are important not just to prevent
+</p><!--l. 62--><p class="indent" >   Your test suite has two important non-obvious functions,
+as regression tests (OK, this one should be obvious) and as
+part of your speciﬁcation. If an existing test starts failing,
+carefully consider Chesterton’s fence (<a 
+ id="x1-3003"></a> Wikipedia, ) before
+taking the easy road and removing the test.
+</p><!--l. 64--><p class="indent" >   Regression tests are important not just to prevent
 unexpectedly breaking functionality, but to allow you to
 refactor with conﬁdence. Great software is the result of
 constant refactoring.
 </p>
    <h3 class="sectionHead"><span class="titlemark">3   </span> <a 
  id="x1-40003"></a>“Unit” Testing</h3>
-<!--l. 67--><p class="noindent" >Descending from the hypothetical to the practical,
+<!--l. 68--><p class="noindent" >Descending from the hypothetical to the practical,
 every practical programming language comes with
 a unit testing environment. Hoon supplies /lib/test
 on the %base desk, paired with the /ted/test thread;
@@ -132,17 +134,17 @@ desk.<span class="footnote-mark"><a
 href="mss3.html#fn2x0"><sup class="textsuperscript">2</sup></a></span><a 
  id="x1-4001f2"></a> 
 The rest of this article assumes a working knowledge of
-                                                
-                                                
 /lib/test.
-</p><!--l. 69--><p class="indent" >   Don’t get hung up on unit testing dogma. A unit is whatever
+                                                
+                                                
+</p><!--l. 70--><p class="indent" >   Don’t get hung up on unit testing dogma. A unit is whatever
 you want it to be. As a subject-oriented programming
 language, Hoon does not support private properties and
 functions: every arm and core in your software is accessible for
 testing. Generally a unit is some self-contained level of
 functionality, either from the programmer’s or the user’s point
 of view.
-</p><!--l. 71--><p class="indent" >   Listing <a 
+</p><!--l. 72--><p class="indent" >   Listing <a 
 href="#x1-4003r1">1<!--tex4ht:ref: lst:inttest --></a>  depicts a more thorough unit test for working
 with a Gall agent. (Some would prefer to call this an
 <span 
@@ -152,10 +154,10 @@ proceed to test the evolution of a database over time (Listing
 href="#x1-4017r2">2<!--tex4ht:ref: lst:dbtime --></a> ). The test is a bit more complex, but the principle holds
 constant: test a unit of functionality.
 </p>
-   <!--l. 73-->
+   <!--l. 74-->
                                                 
                                                 
-<!--l. 79--><p class="indent" >   </p><figure class="float" 
+<!--l. 80--><p class="indent" >   </p><figure class="float" 
 >
                                                 
                                                 
@@ -260,10 +262,10 @@ class="ec-lmbx-9">==</span></span></pre>
                                                 
                                                 
    </figure>
-   <!--l. 94-->
+   <!--l. 95-->
                                                 
                                                 
-<!--l. 102--><p class="indent" >   </p><figure class="float" 
+<!--l. 103--><p class="indent" >   </p><figure class="float" 
 >
                                                 
                                                 
@@ -530,14 +532,14 @@ class="ec-lmtti-10x-x-90">weld</span></span></pre>
                                                 
                                                 
    </figure>
-<!--l. 142--><p class="indent" >   Under the hood, the Obelisk engine calls out to the urQL
+<!--l. 143--><p class="indent" >   Under the hood, the Obelisk engine calls out to the urQL
 parser to create AST commands from the user-created scripts.
 The AS OF clause overrides the time passed in the bowl.
 Finally we weld together two results and check them against
 what we expect. The ﬁrst check, expect-eq, is of the metadata
 returned by the last command. The second check is the ﬁnal
 database state after the evolution.
-</p><!--l. 144--><p class="indent" >   Unit testing purism insists on speciﬁcally tailoring each
+</p><!--l. 145--><p class="indent" >   Unit testing purism insists on speciﬁcally tailoring each
 test to one speciﬁc case of potential failure. This approach
 tends to be pedantic and frequently we pragmatically sneak in
 multiple independent tests in one test bundle, as in Listing <a 
@@ -548,10 +550,10 @@ mixed-case labels are tedious to exhaustively test and
 well-suited to property based testing software like %quiz (see
 below).
 </p>
-   <!--l. 146-->
+   <!--l. 147-->
                                                 
                                                 
-<!--l. 155--><p class="indent" >   </p><figure class="float" 
+<!--l. 156--><p class="indent" >   </p><figure class="float" 
 >
                                                 
                                                 
@@ -809,10 +811,10 @@ class="ec-lmtk-10x-x-90">==</span></span></pre>
                                                 
                                                 
    </figure>
-   <!--l. 198-->
+   <!--l. 199-->
                                                 
                                                 
-<!--l. 208--><p class="indent" >   </p><figure class="float" 
+<!--l. 209--><p class="indent" >   </p><figure class="float" 
 >
                                                 
                                                 
@@ -978,13 +980,13 @@ class="ec-lmtt-9">&#x0022;</span></span></pre>
    </figure>
    <h3 class="sectionHead"><span class="titlemark">4   </span> <a 
  id="x1-50004"></a>Proof by Induction</h3>
-<!--l. 235--><p class="noindent" >We were intentionally dismissive of testing methodologies above
+<!--l. 236--><p class="noindent" >We were intentionally dismissive of testing methodologies above
 because they are mere conventions. There is however some
 actual theory we can leverage in ﬁguring out what and how to
 test.<span class="footnote-mark"><a 
 href="mss4.html#fn3x0"><sup class="textsuperscript">3</sup></a></span><a 
  id="x1-5001f3"></a> 
-</p><!--l. 237--><p class="indent" >   Peano arithmetic is a better lay programmer’s introduction
+</p><!--l. 238--><p class="indent" >   Peano arithmetic is a better lay programmer’s introduction
 to proof by induction. There exists (or perhaps <span 
 class="ec-lmri-10">does not exist</span>) a
 special concept, zero. Playing fast and loose with classical logic,
@@ -998,46 +1000,21 @@ Nock-based programming, <code class="lstinline"><span style="color:#000000">~</s
 counting,<span class="footnote-mark"><a 
 href="mss6.html#fn5x0"><sup class="textsuperscript">5</sup></a></span><a 
  id="x1-5004f5"></a> 
-but the nothing of every inductive type, most importantly trees
-and lists. When speaking to programmers, Peano tells us there is
-a universal nothing <code class="lstinline"><span style="color:#000000">~</span></code> and there is a function called successor
-<!--l. 237--><math 
- xmlns="http://www.w3.org/1998/Math/MathML"  
-display="inline" ><mstyle 
-class="text"><mtext class="textrm" mathvariant="normal" >Succ</mtext></mstyle></math>, which produces
+but the nothing of every inductive type, most importantly
+trees and lists. In speaking to programmers, Peano tells us
+there is a universal nothing <code class="lstinline"><span style="color:#000000">~</span></code> and there is a function called
+successor \(\textrm {Succ}\), which produces some next thing from a previous
                                                 
                                                 
-some next thing from a previous thing (or lack of thing). Applying
-<!--l. 237--><math 
- xmlns="http://www.w3.org/1998/Math/MathML"  
-display="inline" ><mstyle 
-class="text"><mtext class="textrm" mathvariant="normal" >Succ</mtext></mstyle></math> to nothing,
-<!--l. 237--><math 
- xmlns="http://www.w3.org/1998/Math/MathML"  
-display="inline" ><mstyle 
-class="text"><mtext class="textrm" mathvariant="normal" >Succ</mtext></mstyle><mo 
-class="MathClass-open" stretchy="false">(</mo><mn>0</mn><mo 
-class="MathClass-close" stretchy="false">)</mo></math>, gives us the ﬁrst
-thing. Applying <!--l. 237--><math 
- xmlns="http://www.w3.org/1998/Math/MathML"  
-display="inline" ><mstyle 
-class="text"><mtext class="textrm" mathvariant="normal" >Succ</mtext></mstyle></math>
-to the ﬁrst thing, <!--l. 237--><math 
- xmlns="http://www.w3.org/1998/Math/MathML"  
-display="inline" ><mstyle 
-class="text"><mtext class="textrm" mathvariant="normal" >Succ</mtext></mstyle><mo 
-class="MathClass-open" stretchy="false">(</mo><mstyle 
-class="text"><mtext class="textrm" mathvariant="normal" >Succ</mtext></mstyle><mo 
-class="MathClass-open" stretchy="false">(</mo><mn>0</mn><mo 
-class="MathClass-close" stretchy="false">)</mo><mo 
-class="MathClass-close" stretchy="false">)</mo></math>
-gives us the second thing, and so on.
-</p><!--l. 239--><p class="indent" >   Induction appears in unexpected places—think zero-length
+thing (or lack of thing). Applying \(\textrm {Succ}\) to nothing, \(\textrm {Succ}(0)\), gives us the
+ﬁrst thing. Applying \(\textrm {Succ}\) to the ﬁrst thing, \(\textrm {Succ}(\textrm {Succ}(0))\) gives us the second
+thing, and so on.
+</p><!--l. 240--><p class="indent" >   Induction appears in unexpected places—think zero-length
 strings, which do not appear to involve <code class="lstinline"><span style="color:#000000">~</span></code> at all. For instance,
 the Hoon type unit is also an inductive type: it is literally
 either nothing or something. Knowing now what to look for,
 see where you can ﬁnd induction in your own code.
-</p><!--l. 241--><p class="indent" >   What does induction have to do with testing, however? For
+</p><!--l. 242--><p class="indent" >   What does induction have to do with testing, however? For
 inductive types—and simple functions over inductive types—the
 software author only has to prove, or test, two cases: the case
 for zero and the case for the successor value after zero. For
@@ -1050,10 +1027,10 @@ via %yard (<a
  id="x1-5007"></a> <a 
 href="#cite.0@UrbitYard">urbit/yard</a>)).
 </p>
-   <!--l. 243-->
+   <!--l. 244-->
                                                 
                                                 
-<!--l. 248--><p class="indent" >   </p><figure class="float" 
+<!--l. 249--><p class="indent" >   </p><figure class="float" 
 >
                                                 
                                                 
@@ -1163,7 +1140,7 @@ class="ec-lmtt-9">)</span></span></pre>
                                                 
                                                 
    </figure>
-<!--l. 265--><p class="indent" >   “Hey”, you say—“that’s more than two tests.” That’s
+<!--l. 266--><p class="indent" >   “Hey”, you say—“that’s more than two tests.” That’s
 right: two is the bare minimum of required tests, and
 only applies to the simplest units of inductive testing. In
 this case the ﬁrst two tests suﬃce, but minimal tests
@@ -1174,7 +1151,7 @@ your test suite. You don’t want users to struggle with
 examples that don’t work, or worse, don’t even build.
 More tests don’t hurt anything; the computer doesn’t get
 tired.
-</p><!--l. 267--><p class="indent" >   Another reason for additional tests is taking a page
+</p><!--l. 268--><p class="indent" >   Another reason for additional tests is taking a page
 out of “white box” or “gray box” testing. If you know
 that there is special logic for the ﬁrst successor case, you
 need to test the ﬁrst case independently as well as a
@@ -1185,31 +1162,21 @@ simpler.
 </p>
    <h4 class="subsectionHead"><span class="titlemark">4.1   </span> <a 
  id="x1-60004.1"></a>The First Cartesian Explosion</h4>
-<!--l. 271--><p class="noindent" >Through the mathematics of currying programmatic functions,
+<!--l. 272--><p class="noindent" >Through the mathematics of currying programmatic functions,
 we can have input arguments of multiple inductive
 types.<span class="footnote-mark"><a 
 href="mss7.html#fn6x0"><sup class="textsuperscript">6</sup></a></span><a 
  id="x1-6001f6"></a> 
 This results in the minimum number of tests being the
-number of inductive input elements squared, starting with
-all elements set to <code class="lstinline"><span style="color:#000000">~</span></code> and so forth. Listing <a 
-href="#x1-6002r5">5<!--tex4ht:ref: lst:single --></a>  depicts
-a series of tests for the append gate subject to this
-<!--l. 271--><math 
- xmlns="http://www.w3.org/1998/Math/MathML"  
-display="inline" ><msup><mrow 
-><mi 
->n</mi></mrow><mrow 
-><mn>2</mn></mrow></msup 
-></math>
-explosion.
+number of inductive input elements squared, starting with all
+elements set to <code class="lstinline"><span style="color:#000000">~</span></code> and so forth. Listing <a 
+href="#x1-6002r5">5<!--tex4ht:ref: lst:single --></a>  depicts a series of
+tests for the append gate subject to this \(n^2\) explosion.
 </p>
+   <!--l. 274-->
                                                 
                                                 
-   <!--l. 273-->
-                                                
-                                                
-<!--l. 278--><p class="indent" >   </p><figure class="float" 
+<!--l. 279--><p class="indent" >   </p><figure class="float" 
 >
                                                 
                                                 
@@ -1323,13 +1290,13 @@ class="ec-lmtt-9">[2])</span></span></pre>
                                                 
                                                 
    </figure>
-<!--l. 299--><p class="indent" >   In this situation, the required number of tests may grow
+<!--l. 300--><p class="indent" >   In this situation, the required number of tests may grow
 exponentially but in most practical cases remains a relatively
 small ﬁnite number.
 </p>
    <h4 class="subsectionHead"><span class="titlemark">4.2   </span> <a 
  id="x1-70004.2"></a>The Second Cartesian Explosion</h4>
-<!--l. 303--><p class="noindent" >Input argument interactions are not the only source of
+<!--l. 304--><p class="noindent" >Input argument interactions are not the only source of
 combinatorial explosion in testing. Imagine that your
 function (gate) is a black box. You start submitting random
 input to ﬁgure out what the underlying algorithm is.
@@ -1343,11 +1310,11 @@ inductive types making for an even bigger cartesian explosion
 of inputs to test. It is no longer practical to construct all the
 tests required by our theory. The number is still ﬁnite, but
 impractically large. What is to be done?
-</p><!--l. 305--><p class="indent" >   There is no general solution. Complete code coverage with
+</p><!--l. 306--><p class="indent" >   There is no general solution. Complete code coverage with
 tests is a start, inductively testing over each clause in a unit.
 This is time-consuming and requires thinking deeply about the
 code and its structure.
-</p><!--l. 307--><p class="indent" >   Another approach is to favor so-called edge case testing, in
+</p><!--l. 308--><p class="indent" >   Another approach is to favor so-called edge case testing, in
 which you test the boundaries of the input space. This is a
 good idea, but it is not a complete solution. It is not always
 clear what the edge is, and it is not always clear that the
@@ -1355,7 +1322,7 @@ edge is the same for all inductive types. In the case of
 testing a string function, should an edge be the empty
 string, a string with one character, or a string with two
 characters?
-</p><!--l. 309--><p class="indent" >   An automated testing solution called property-based
+</p><!--l. 310--><p class="indent" >   An automated testing solution called property-based
 testing may be applicable in these cases. The idea of
 property-based testing is to develop and instantiate invariant
 properties of the code and let software generate random
@@ -1370,7 +1337,7 @@ is a well-documented Hoon implementation <a
 href="#cite.0@Hjort2023">hjorthjort/quiz</a>.
 Once again, this solution requires some deep thinking about
 the code and its speciﬁcation.
-</p><!--l. 311--><p class="indent" >   From our experience with the F# implementation of
+</p><!--l. 312--><p class="indent" >   From our experience with the F\(^\sharp \) implementation of
 property-based testing, we expect that you will need to boost
 the number of random input permutations beyond the default
 of 100 to get the kind of coverage that is “reasonably”
@@ -1379,18 +1346,18 @@ the inputs are randomly generated each run, however, a
 property test of production code may fail when nothing has
 changed. Then think about how to explain to your boss that
 your tests are not deterministic.)
-</p><!--l. 313--><p class="indent" >   Lastly, whenever you ﬁx a bona ﬁde production bug
+</p><!--l. 314--><p class="indent" >   Lastly, whenever you ﬁx a bona ﬁde production bug
 (or one that a framework like %quiz discovered), add a
 test case to address that circumstance. This not only
 provides the standard for when the bug has been ﬁxed, but
 protects against regressing to the prior behavior (thus, a
 “regression test”). Congratulations, you have just reﬁned your
 speciﬁcation.
-</p><!--l. 315--><p class="noindent" >
+</p><!--l. 316--><p class="noindent" >
 </p>
    <h3 class="sectionHead"><span class="titlemark">5   </span> <a 
  id="x1-80005"></a>Testing Failure</h3>
-<!--l. 317--><p class="noindent" >In our experience failure modes are the most overlooked part
+<!--l. 318--><p class="noindent" >In our experience failure modes are the most overlooked part
 of sofware development. It starts with passing insuﬃcient, or
 no information from the programmed points of failure. So even
 before testing failure modes make sure you distinguish (i.e.
@@ -1398,7 +1365,7 @@ make unique) each message from every point of failure and
 include any and all relevant information available for
 debugging.
 </p>
-   <!--l. 319-->
+   <!--l. 320-->
    <pre class="lstlisting" id="listing-11"><span class="label"><a 
  id="x1-8001r1"></a></span><span style="color:#404040"><span 
 class="ec-lmtk-10x-x-90">~|</span></span><span style="color:#000000"><span 
@@ -1417,7 +1384,7 @@ class="ec-lmtt-9">)</span></span></pre>
                                                 
                                                 
    
-<!--l. 323--><p class="indent" >   The standard /lib/test library, as of this writing, can test
+<!--l. 324--><p class="indent" >   The standard /lib/test library, as of this writing, can test
 for failure but not for an expected message. A modiﬁed testing
 arm (Listing <a 
 href="#x1-8002r6">6<!--tex4ht:ref: lst:error --></a> ) can be included in a testing thread to
@@ -1427,10 +1394,10 @@ expected error message in the Obelisk database engine which
 uses this functionality to verify that the correct error message
 is raised on crash.
 </p>
-   <!--l. 325-->
+   <!--l. 326-->
                                                 
                                                 
-<!--l. 330--><p class="indent" >   </p><figure class="float" 
+<!--l. 331--><p class="indent" >   </p><figure class="float" 
 >
                                                 
                                                 
@@ -1595,10 +1562,10 @@ class="ec-lmtk-10x-x-90">==</span></span></pre>
                                                 
                                                 
    </figure>
-   <!--l. 357-->
+   <!--l. 358-->
                                                 
                                                 
-<!--l. 362--><p class="indent" >   </p><figure class="float" 
+<!--l. 363--><p class="indent" >   </p><figure class="float" 
 >
                                                 
                                                 
@@ -1717,147 +1684,227 @@ class="ec-lmtt-9">)</span></span></pre>
    </figure>
    <h3 class="sectionHead"><span class="titlemark">6   </span> <a 
  id="x1-90006"></a>Conclusion</h3>
-<!--l. 380--><p class="noindent" >Keep the following principles in mind when producing and
+<!--l. 381--><p class="noindent" >Keep the following principles in mind when producing and
 evaluating code as a software developer.
-</p><!--l. 382--><p class="indent" >
+</p><!--l. 383--><p class="indent" >
      </p><ol  class="enumerate1" >
 <li 
   class="enumerate" id="x1-9002x1">
-     <!--l. 383--><p class="noindent" >Strive  to  make  the  collection  of  units  of  testing
+     <!--l. 384--><p class="noindent" >Strive  to  make  the  collection  of  units  of  testing
      exhaustive, both primitive units of code and units of
      work from the user perspective.
      </p></li>
 <li 
   class="enumerate" id="x1-9004x2">
-     <!--l. 384--><p class="noindent" >Test inductively wherever possible.
+     <!--l. 385--><p class="noindent" >Test inductively wherever possible.
      </p></li>
 <li 
   class="enumerate" id="x1-9006x3">
-     <!--l. 385--><p class="noindent" >Test from a white or gray box perspective.
+     <!--l. 386--><p class="noindent" >Test from a white or gray box perspective.
      </p></li>
 <li 
   class="enumerate" id="x1-9008x4">
-     <!--l. 386--><p class="noindent" >Test the failure modes.
+     <!--l. 387--><p class="noindent" >Test the failure modes.
      </p></li>
 <li 
   class="enumerate" id="x1-9010x5">
-     <!--l. 387--><p class="noindent" >Test all the examples in your documentation.
+     <!--l. 388--><p class="noindent" >Test all the examples in your documentation.
      </p></li>
 <li 
   class="enumerate" id="x1-9012x6">
                                                 
                                                 
-     <!--l. 388--><p class="noindent" >In a world lacking documentation tests may be the
+     <!--l. 389--><p class="noindent" >In a world lacking documentation tests may be the
      only real speciﬁcation.<span class="footnote-mark"><a 
 href="mss8.html#fn7x0"><sup class="textsuperscript">7</sup></a></span><a 
  id="x1-9013f7"></a> 
      </p></li>
 <li 
   class="enumerate" id="x1-9016x7">
-     <!--l. 389--><p class="noindent" >Regression  tests  are  the  key  to  refactoring  with
+     <!--l. 390--><p class="noindent" >Regression  tests  are  the  key  to  refactoring  with
      conﬁdence. Beautiful code comes from refactoring.
      <img 
 src="ustj-logo.svg" alt="PIC"  
  /></p></li></ol>
-<!--l. 393--><p class="noindent" >
+<!--l. 395--><p class="noindent" >
 </p>
    <h3 class="sectionHead"><a 
  id="x1-10000"></a>References</h3>
-<!--l. 393--><p class="noindent" >
+<!--l. 395--><p class="noindent" >
    </p><dl class="thebibliography"><dt id="X0-Beck2023" class="thebibliography">
 </dt><dd 
 id="bib-1" class="thebibliography">
-   <!--l. 393--><p class="noindent" ><a 
- id="cite.0@Beck2023"></a>Beck,   Kent   (Dec. 11,   2023)   <span 
-class="ec-lmri-10">Canon   </span><span class="small-caps">tdd</span>.   <span class="small-caps">url</span>:
+   <!--l. 395--><p class="noindent" ><a 
+ id="cite.0@Beck2023"></a>Beck, Kent
+   (2023)
+   “Canon
+   <span class="small-caps">tdd</span>”.
+   <span class="small-caps">url</span>:
    <a 
 href="https://tidyfirst.substack.com/p/canon-tdd" class="url" ><span 
 class="ec-lmtt-10">https://tidyfirst.substack.com/p/canon-tdd</span></a>
-   (visited on 02/20/2024).
+   (visited
+   on
+   ~2024.2.20).
    </p></dd><dt id="X0-Hjort2023" class="thebibliography">
 </dt><dd 
 id="bib-2" class="thebibliography">
-   <!--l. 393--><p class="noindent" ><a 
- id="cite.0@Hjort2023"></a>~bithex-topnym @hjorthjort (Aug. 14, 2023) <span 
-class="ec-lmri-10">Quiz: A</span>
-   <span 
-class="ec-lmri-10">randomized  property  testing  library  for  Urbit</span>.  <span class="small-caps">url</span>:
+                                                
+                                                
+   <!--l. 395--><p class="noindent" ><a 
+ id="cite.0@Hjort2023"></a>~bithex-topnym @hjorthjort
+   (2023)
+   “Quiz:
+   A
+   randomized
+   property
+   testing
+   library
+   for
+   Urbit”.
+   <span class="small-caps">url</span>:
    <a 
 href="https://github.com/hjorthjort/quiz" class="url" ><span 
-class="ec-lmtt-10">https://github.com/hjorthjort/quiz</span></a>  (visited  on
-   02/07/2024).
+class="ec-lmtt-10">https://github.com/hjorthjort/quiz</span></a>
+   (visited
+   on
+   ~2024.2.7).
    </p></dd><dt id="X0-Feathers2005" class="thebibliography">
 </dt><dd 
 id="bib-3" class="thebibliography">
-   <!--l. 393--><p class="noindent" ><a 
- id="cite.0@Feathers2005"></a>Feathers, Michael C. (2005). <span 
-class="ec-lmri-10">Working Eﬀectively with</span>
+   <!--l. 395--><p class="noindent" ><a 
+ id="cite.0@Feathers2005"></a>Feathers, Michael C.
+   (2005).
    <span 
-class="ec-lmri-10">Legacy Code</span>. Prentice Hall. <span class="small-caps">isbn</span>: 978-0-13-117705-5.
+class="ec-lmri-10">Working</span>
+   <span 
+class="ec-lmri-10">Eﬀectively</span>
+   <span 
+class="ec-lmri-10">with</span>
+   <span 
+class="ec-lmri-10">Legacy</span>
+   <span 
+class="ec-lmri-10">Code</span>.
+   Prentice
+   Hall.
+   <span class="small-caps">isbn</span>:
+   978-0-13-117705-5.
    </p></dd><dt id="X0-Davis2022" class="thebibliography">
 </dt><dd 
 id="bib-4" class="thebibliography">
+   <!--l. 395--><p class="noindent" ><a 
+ id="cite.0@Davis2022"></a>~lagrev-nocfep @sigilante
+   (2022)
+   “Writing
+   Robust
+   Hoon:
+   A
+   Guide
                                                 
                                                 
-   <!--l. 393--><p class="noindent" ><a 
- id="cite.0@Davis2022"></a>~lagrev-nocfep @sigilante (Feb. 2, 2022) <span 
-class="ec-lmri-10">Writing Robust</span>
-   <span 
-class="ec-lmri-10">Hoon: A Guide to Urbit Unit Testing</span>. <span class="small-caps">url</span>: <a 
+   to
+   Urbit
+   Unit
+   Testing”.
+   <span class="small-caps">url</span>:
+   <a 
 href="https://medium.com/dcspark/writing-robust-hoon-a-guide-to-urbit-unit-testing-82b2631fe20a" class="url" ><span 
 class="ec-lmtt-10">https://medium.com/dcspark/writing-robust-hoon-a-guide-to-urbit-unit-testing-82b2631fe20a</span></a>
-   (visited on 02/20/2024).
+   (visited
+   on
+   ~2024.2.20).
    </p></dd><dt id="X0-FoxSequent" class="thebibliography">
 </dt><dd 
 id="bib-5" class="thebibliography">
-   <!--l. 393--><p class="noindent" ><a 
- id="cite.0@FoxSequent"></a>~nomryg-nilref  @jackfoxy  (2024)  <span 
-class="ec-lmri-10">Sequent:  A  library</span>
-   <span 
-class="ec-lmri-10">of  Hoon  list  functions  for  mortal  developers</span>.  <span class="small-caps">url</span>:
+   <!--l. 395--><p class="noindent" ><a 
+ id="cite.0@FoxSequent"></a>~nomryg-nilref @jackfoxy
+   (~2024..)
+   “Sequent:
+   A
+   library
+   of
+   Hoon
+   list
+   functions
+   for
+   mortal
+   developers”.
+   <span class="small-caps">url</span>:
    <a 
 href="https://github.com/jackfoxy/sequent" class="url" ><span 
-class="ec-lmtt-10">https://github.com/jackfoxy/sequent</span></a> (visited  on
-   02/07/2024).
+class="ec-lmtt-10">https://github.com/jackfoxy/sequent</span></a>
+   (visited
+   on
+   ~2024.2.7).
    </p></dd><dt id="X0-WikipediaChesterton" class="thebibliography">
 </dt><dd 
 id="bib-6" class="thebibliography">
-   <!--l. 393--><p class="noindent" ><a 
- id="cite.0@WikipediaChesterton"></a>Wikipedia (2024a) <span 
-class="ec-lmri-10">G. K. Chesterton, Chesterton’s Fence</span>.
-   <span class="small-caps">url</span>: <a 
+   <!--l. 395--><p class="noindent" ><a 
+ id="cite.0@WikipediaChesterton"></a>Wikipedia
+   (~2024..a)
+   “G.
+   K.
+   Chesterton,
+   Chesterton’s
+   Fence”.
+                                                
+                                                
+   <span class="small-caps">url</span>:
+   <a 
 href="https://en.wikipedia.org/wiki/G._K._Chesterton" class="url" ><span 
 class="ec-lmtt-10">https://en.wikipedia.org/wiki/G._K._Chesterton</span></a>
-   (visited on 02/07/2024).
+   (visited
+   on
+   ~2024.2.7).
    </p></dd><dt id="X0-WikipediaInduction" class="thebibliography">
 </dt><dd 
 id="bib-7" class="thebibliography">
-   <!--l. 393--><p class="noindent" ><a 
- id="cite.0@WikipediaInduction"></a>—   (2024b) <span 
-class="ec-lmri-10">Mathematical Induction</span>. <span class="small-caps">url</span>: <a 
+   <!--l. 395--><p class="noindent" ><a 
+ id="cite.0@WikipediaInduction"></a>—   (~2024..b)
+   “Mathematical
+   Induction”.
+   <span class="small-caps">url</span>:
+   <a 
 href="https://en.wikipedia.org/wiki/Mathematical_induction" class="url" ><span 
 class="ec-lmtt-10">https://en.wikipedia.org/wiki/Mathematical_induction</span></a>
-   (visited on 02/20/2024).
+   (visited
+   on
+   ~2024.2.20).
    </p></dd><dt id="X0-UrbitYard" class="thebibliography">
 </dt><dd 
 id="bib-8" class="thebibliography">
-   <!--l. 393--><p class="noindent" ><a 
- id="cite.0@UrbitYard"></a><span 
-class="ec-lmri-10">Yard:      A      Developer      Commons       </span>(2024).
-   <span class="small-caps">url</span>:  <a 
+   <!--l. 395--><p class="noindent" ><a 
+ id="cite.0@UrbitYard"></a>“Yard:
+   A
+   Developer
+   Commons”
+   (~2024..).
+   <span class="small-caps">url</span>:
+   <a 
 href="https://github.com/urbit/yard" class="url" ><span 
-class="ec-lmtt-10">https://github.com/urbit/yard</span></a> (visited  on
-   02/07/2024).
+class="ec-lmtt-10">https://github.com/urbit/yard</span></a>
+   (visited
+   on
+   ~2024.2.7).
    </p></dd><dt id="X0-Yarvin2006" class="thebibliography">
 </dt><dd 
 id="bib-9" class="thebibliography">
-   <!--l. 393--><p class="noindent" ><a 
- id="cite.0@Yarvin2006"></a>Yarvin,  Curtis  (Jan. 31,  2006)  <span 
-class="ec-lmri-10">U,  a  small  model</span>.
-   <span class="small-caps">url</span>: <a 
+   <!--l. 395--><p class="noindent" ><a 
+ id="cite.0@Yarvin2006"></a>Yarvin, Curtis
+   (2006)
+   “U,
+   a
+   small
+   model”.
+   <span class="small-caps">url</span>:
+                                                
+                                                
+   <a 
 href="http://urbit.sourceforge.net/u.txt" class="url" ><span 
-class="ec-lmtt-10">http://urbit.sourceforge.net/u.txt</span></a> (visited
-   on 02/20/2024).</p></dd></dl>
+class="ec-lmtt-10">http://urbit.sourceforge.net/u.txt</span></a>
+   (visited
+   on
+   ~2024.2.20).</p></dd></dl>
     
 </body> 
 </html>
