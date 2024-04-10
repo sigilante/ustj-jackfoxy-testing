@@ -15,7 +15,7 @@
 \fancyfoot[L]{{\footnotesize
               %% We toggle between these:
               % Manuscript submitted for review.\\
-              {\it Urbit Systems Technical Journal} I:1 (2024):  20–23. \\
+              {\it Urbit Systems Technical Journal} I:1 (2024):  59–73. \\
               ~ \\
               Address author correspondence to \authorpatp.
               }}
@@ -43,7 +43,7 @@
 
 % We will adjust page numbering in final editing.
 \pagenumbering{arabic}
-\setcounter{page}{1}
+\setcounter{page}{59}
 
 \tableofcontents
 
@@ -57,7 +57,7 @@ No one writes non-trivial software without testing, even if you come to believe 
 
 \section{Testing Frameworks}
 
-Use what is useful and don't get hung-up on a particular framework or methodology. Record tests as you develop. You may think this slows down your development. That's not necessarily a bad thing. You will move forward with confidence that the last thing you worked on really works and you will find yourself thinking through your specification at a deeper level. This is important in a world of mostly incomplete and nebulous specs. What I am driving at is a cousin to test-driven development.\footnote{\citet{Beck2023} summarizes the principles of \textsc{tdd}.} Think of it as real-time test development.
+Use what is useful and don't get hung-up on a particular framework or methodology. Record tests as you develop. You may think this slows down your development. That's not necessarily a bad thing. You will move forward with confidence that the last thing you worked on really works and you will find yourself thinking through your specification at a deeper level. This is important in a world of mostly incomplete and nebulous specs. What I am driving at is a cousin to test-driven development.\footnote{\citet{Beck2023} summarizes the principles of {\sc tdd}.} Think of it as real-time test development.
 
 Your test suite has two important non-obvious functions, as regression tests (OK, this one should be obvious) and as part of your specification. If an existing test starts failing, carefully consider Chesterton's fence \citep{WikipediaChesterton} before taking the easy road and removing the test.
 
@@ -65,7 +65,7 @@ Regression tests are important not just to prevent unexpectedly breaking functio
 
 \section{“Unit” Testing}
 
-Descending from the hypothetical to the practical, every practical programming language comes with a unit testing environment. Hoon supplies \texttt{/lib/test} on the \texttt{\%base} desk, paired with the \texttt{/ted/test} thread; the \texttt{/lib} file should be copied to your development desk.\footnote{\citet{Davis2022} discusses this procedure in detail.} The rest of this article assumes a working knowledge of \texttt{/lib/test}.
+Descending from the hypothetical to the practical, every practical programming language comes with a unit testing environment. Hoon supplies \lstinline[style=inlinecode]{/lib/test} on the \lstinline[style=inlinecode]{%base} desk, paired with the \lstinline[style=inlinecode]{/ted/test} thread; the \texttt{/lib} file should be copied to your development desk.\footnote{\citet{Davis2022} discusses this procedure in detail.} The rest of this article assumes a working knowledge of \lstinline[style=inlinecode]{/lib/test}.
 
 Don't get hung up on unit testing dogma. A unit is whatever you want it to be. As a subject-oriented programming language, Hoon does not support private properties and functions: every arm and core in your software is accessible for testing. Generally a unit is some self-contained level of functionality, either from the programmer's or the user's point of view.
 
@@ -140,9 +140,9 @@ Listing \ref{lst:inttest} depicts a more thorough unit test for working with a G
   ==  :: weld
 \end{lstlisting}
 
-Under the hood, the Obelisk engine calls out to the urQL parser to create AST commands from the user-created scripts. The \texttt{AS OF} clause overrides the time passed in the bowl. Finally we weld together two results and check them against what we expect. The first check, expect-eq, is of the metadata returned by the last command. The second check is the final database state after the evolution.
+Under the hood, the Obelisk engine calls out to the urQL parser to create {\sc ast} commands from the user-created scripts. The \texttt{AS OF} clause overrides the time passed in the bowl. Finally we weld together two results and check them against what we expect. The first check, \lstinline[style=inlinecode]{++expect-eq}, is of the metadata returned by the last command. The second check is the final database state after the evolution.
 
-Unit testing purism insists on specifically tailoring each test to one specific case of potential failure. This approach tends to be pedantic and frequently we pragmatically sneak in multiple independent tests in one test bundle, as in Listing~\ref{lst:bundle}.  \texttt{++test-alter-index-1} is not an atomic unit test but tests several qualities together. Values like whitespace and mixed-case labels are tedious to exhaustively test and well-suited to property based testing software like \texttt{\%quiz} (see below).
+Unit testing purism insists on specifically tailoring each test to one specific case of potential failure. This approach tends to be pedantic and frequently we pragmatically sneak in multiple independent tests in one test bundle, as in Listing~\ref{lst:bundle}.  \lstinline[style=inlinecode]{++test-alter-index-1} is not an atomic unit test but tests several qualities together. Values like whitespace and mixed-case labels are tedious to exhaustively test and well-suited to property based testing software like \lstinline[style=inlinecode]{%quiz} (see below).
 
 \begin{lstlisting}[
   float,
@@ -233,7 +233,7 @@ Unit testing purism insists on specifically tailoring each test to one specific 
 
 \section{Proof by Induction}
 
-We were intentionally dismissive of testing methodologies a\-bove because they are mere conventions. There is however some actual theory we can leverage in figuring out what and how to test.\footnote{\citet{WikipediaInduction} provides a modestly technical exposition of mathematical induction. You can skip it because we will explain it non-rigorously for lay programmers. We also quibble about the inclusion of zero as a natural number. While old school maths started the natural numbers with “1”, but computer science has since infected maths. Have you ever seen zero of anything? No—it is not natural at all. Zero is a very, very special number. It's an abstraction that does not map to anything in the physical world.}
+We were intentionally dismissive of testing methodologies a\-bove because they are mere conventions. There is however some actual theory we can leverage in figuring out what and how to test.\footnote{\citeauthor{WikipediaInduction} (2024b) provides a modestly technical exposition of mathematical induction. You can skip it because we will explain it non-rigorously for lay programmers.  We also quibble about the inclusion of zero as a natural number.  While old school maths started the natural numbers with “1”, but computer science has since infected maths. (Have you ever seen zero of anything?   No—it is not natural at all.)  Zero is a very, very special number.  It's an abstraction that does not map to anything in the physical world.}
 
 Peano arithmetic is a better lay programmer's introduction to proof by induction. There exists (or perhaps \emph{does not exist}) a special concept, zero. Playing fast and loose with classical logic, “ex nihil sequitur quodlibet”, from nothing (more commonly a falsehood, or a contradiction) follows everything (i.e. anything).\footnote{The “principle of explosion” rigorously follows from use of disjunctive syllogisms.  Here, we jocosely indicate that by proceeding from zero inductively we can demonstrate desired properties of testing.} Zero is not only an integer; rather, in terms of Nock-based programming, \lstinline[style=inlinecode]{~} is not only the beginning of counting,\footnote{Yarvin opted to invert \texttt{true} (as 0) and \texttt{false} (as 1) \citep{Yarvin2006}, meaning that Nock loobeans do not align inductively with other inductive types.} but the nothing of every inductive type, most importantly trees and lists. In speaking to programmers, Peano tells us there is a universal nothing \lstinline[style=inlinecode]{~} and there is a function called successor $\textrm{Succ}$, which produces some next thing from a previous thing (or lack of thing). Applying $\textrm{Succ}$ to nothing, $\textrm{Succ}(0)$, gives us the first thing.  Applying $\textrm{Succ}$ to the first thing, $\textrm{Succ}(\textrm{Succ}(0))$ gives us the second thing, and so on.
 
@@ -301,27 +301,32 @@ In this situation, the required number of tests may grow exponentially but in mo
 
 \subsection{The Second Cartesian Explosion}
 
-Input argument interactions are not the only source of combinatorial explosion in testing. Imagine that your function (gate) is a black box. You start submitting random input to figure out what the underlying algorithm is. However, it turns out that you discover that there is not one consistent algorithm for all inputs. Some values or ranges of values behave differently from others. (Unexpected UTF-8 whitespace characters are notorious for revealing head-scratching bugs—so imagine all possible inputs over complex XML.) You could model this behavior as multiple inductive types making for an even bigger cartesian explosion of inputs to test. It is no longer practical to construct all the tests required by our theory. The number is still finite, but impractically large. What is to be done?
+Input argument interactions are not the only source of combinatorial explosion in testing. Imagine that your function (gate) is a black box. You start submitting random input to figure out what the underlying algorithm is. However, it turns out that you discover that there is not one consistent algorithm for all inputs. Some values or ranges of values behave differently from others. (Unexpected {\sc utf}-8 whitespace characters are notorious for revealing head-scratching bugs—so imagine all possible inputs over complex {\sc xml}.) You could model this behavior as multiple inductive types making for an even bigger cartesian explosion of inputs to test. It is no longer practical to construct all the tests required by our theory. The number is still finite, but impractically large. What is to be done?
 
 There is no general solution. Complete code coverage with tests is a start, inductively testing over each clause in a unit. This is time-consuming and requires thinking deeply about the code and its structure.
 
 Another approach is to favor so-called edge case testing, in which you test the boundaries of the input space. This is a good idea, but it is not a complete solution. It is not always clear what the edge is, and it is not always clear that the edge is the same for all inductive types. In the case of testing a string function, should an edge be the empty string, a string with one character, or a string with two characters? 
 
-An automated testing solution called property-based testing may be applicable in these cases. The idea of property-based testing is to develop and instantiate invariant properties of the code and let software generate random inputs. The software runs the random inputs and tests the outputs against the invariant properties. An architecture for this approach was originally developed for Haskell and has since ported to many other languages, including Hoon.  \texttt{\%quiz} is a well-documented Hoon implementation \citetrepo{Hjort2023}.  Once again, this solution requires some deep thinking about the code and its specification.
+An automated testing solution called property-based testing may be applicable in these cases. The idea of property-based testing is to develop and instantiate invariant properties of the code and let software generate random inputs. The software runs the random inputs and tests the outputs against the invariant properties. An architecture for this approach was originally developed for Haskell and has since ported to many other languages, including Hoon.  \lstinline[style=inlinecode]{%quiz} is a well-documented Hoon implementation \citetrepo{Hjort2023}.  Once again, this solution requires some deep thinking about the code and its specification.
 
 From our experience with the F{$^\sharp$} implementation of pro\-perty-based testing, we expect that you will need to boost the number of random input permutations beyond the default of 100 to get the kind of coverage that is ``reasonably'' exhaustive. We found 10,000 to be frequently adequate. (Since the inputs are randomly generated each run, however, a property test of production code may fail when nothing has changed. Then think about how to explain to your boss that your tests are not deterministic.)
 
-Lastly, whenever you fix a bona fide production bug (or one that a framework like \texttt{\%quiz} discovered), add a test case to address that circumstance. This not only provides the standard for when the bug has been fixed, but protects against regressing to the prior behavior (thus, a “regression test”). Congratulations, you have just refined your specification.
+Lastly, whenever you fix a bona fide production bug (or one that a framework like \lstinline[style=inlinecode]{%quiz} discovered), add a test case to address that circumstance. This not only provides the standard for when the bug has been fixed, but protects against regressing to the prior behavior (thus, a ``regression test''). Congratulations, you have just refined your specification.
 
 \section{Testing Failure}
 
-In our experience failure modes are the most overlooked part of sofware development. It starts with passing insufficient, or no information from the programmed points of failure. So even before testing failure modes make sure you distinguish (i.e. make unique) each message from every point of failure and include any and all relevant information available for debugging.
+In our experience failure modes are the most overlooked part of sofware development. It starts with passing insufficient, or no information from the programmed points of failure. So even before testing failure modes make sure you distinguish (i.e. make unique) each message from every point of failure and include any and all relevant information available for debugging (cf. Listing~\ref{lst:dup}).
 
-\begin{lstlisting}[style=listingcode]
+\begin{lstlisting}[
+  float,
+  style=listingcode,
+  caption={Error message for duplicate key},
+  label={lst:dup}
+]
 ~|("cannot add duplicate key: {<row-key>}" !!)
 \end{lstlisting}
 
-The standard \texttt{/lib/test} library, as of this writing, can test for failure but not for an expected message.  A modified testing arm (Listing~\ref{lst:error}) can be included in a testing thread to facilitate this kind of testing.  Listing~\ref{lst:urql} shows a test for an expected error message in the Obelisk database engine which uses this functionality to verify that the correct error message is raised on crash.
+The standard \lstinline[style=inlinecode]{/lib/test} library, as of this writing, can test for failure but not for an expected message.  A modified testing arm (Listing~\ref{lst:error}) can be included in a testing thread to facilitate this kind of testing.  Listing~\ref{lst:urql} shows a test for an expected error message in the Obelisk database engine which uses this functionality to verify that the correct error message is raised on crash.
 
 \begin{lstlisting}[
   float,
