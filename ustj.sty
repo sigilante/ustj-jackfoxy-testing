@@ -45,6 +45,7 @@
     !:, !., !\,, !;, !>, !<, !@, !=, !?, !!,
     /?, /-, /+, /=, /\%, /\$, /*,
     +|, +\$, ++, +*,
+    \%|, \%\&
   },
   morekeywords={
     @, @c, @d, @da, @dr, @f, @i, @if, @is, @n, @p, @q, @r, @rh, @rs, @rd, @rq, @s, @sb, @sd, @sv, @sw, @sx, @t, @ta, @tas, @u, @ub, @uc, @ud, @uv, @uw, @ux
@@ -68,7 +69,7 @@
     breaklines=true,
     breakatwhitespace=true,
     commentstyle=\color{Gray}\emph,
-    keywordstyle=\color{darkgray}\bfseries
+    keywordstyle=\bfseries
 }
 \lstdefinestyle{listingcode}{
     language=Hoon,
@@ -82,7 +83,7 @@
     showspaces=false,
     keepspaces,
     upquote=true,
-    commentstyle=\color{Gray}\emph,
+    commentstyle=\color{darkgray}\emph,
     keywordstyle=\color{darkgray}\bfseries
 }
 \lstdefinestyle{listingblock}{
@@ -96,7 +97,7 @@
     showspaces=false,
     keepspaces,
     upquote=true,
-    commentstyle=\color{Gray}\emph,
+    commentstyle=\color{darkgray}\emph,
     keywordstyle=\color{darkgray}\bfseries
 }
 \lstdefinestyle{listingcode_python}{
@@ -111,7 +112,7 @@
     showspaces=false,
     keepspaces,
     upquote=true,
-    commentstyle=\color{Gray}\emph,
+    commentstyle=\color{darkgray}\emph,
     keywordstyle=\color{darkgray}\bfseries
 }
 \lstdefinestyle{listingcode_c}{
@@ -126,7 +127,7 @@
     showspaces=false,
     keepspaces,
     upquote=true,
-    commentstyle=\color{Gray}\emph,
+    commentstyle=\color{darkgray}\emph,
     keywordstyle=\color{darkgray}\bfseries
 }
 
@@ -169,6 +170,7 @@
     eprint=false
 ]{biblatex}
 \usepackage[hidelinks,breaklinks=true]{hyperref}
+\renewcommand\UrlFont{\monofont}
 \renewcommand{\UrlBreaks}{\do\/\do-}
 
 % Patch the \bibsetup command to set the bibliography to be ragged-right
